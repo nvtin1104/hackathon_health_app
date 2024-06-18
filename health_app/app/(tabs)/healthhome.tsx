@@ -1,10 +1,6 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import React from 'react';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
 export default function healthScreen() {
   return (
@@ -32,7 +28,9 @@ export default function healthScreen() {
         <View style={styles.grid}>
           <View style={styles.gridItem}>
             <Image source={{ uri: 'https://placehold.co/50x50' }} style={styles.gridImage} />
-            <Text style={styles.gridTitle}>Blood Pressure</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('blood-pressure')}>
+              <Text style={styles.gridTitle}>Blood Pressure</Text>
+            </TouchableOpacity>
             <Text style={styles.gridValue}>100/76 mmHg</Text>
           </View>
           <View style={styles.gridItem}>
