@@ -166,6 +166,8 @@ const styles = StyleSheet.create({
     icon: {
         width: 100,
         height: 100,
+        marginRight: 16,
+        resizeMode: 'cover',
         flex: 1,
         justifyContent: 'center',
     borderRadius: 20,
