@@ -26,6 +26,7 @@ const START_SERVER = () => {
     res.send('Hello World!');
   });
 
+  app.use(express.static('public'));
   // api
   app.use('/api', APIs);
   // -------------------
