@@ -1,9 +1,13 @@
+/* eslint-disable semi */
 import express from 'express';
-
+import { usersApi } from './usersRouter';
 const Router = express.Router();
 
-Router.get('/', (req, res) => {
-    res.send('Hello from API!');
-});
+// user
+Router.use('/users', usersApi);
 
-export default Router;
+Router.get('/', (req, res) => {
+  res.send('Hello from API!');
+});
+// export default Router;
+export const APIs = Router;

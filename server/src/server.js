@@ -8,8 +8,7 @@ import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware';
 import { corsOptions } from './config/cors';
 import http from 'http';
 import cookieParser from 'cookie-parser';
-import Router from './routes';
-
+import { APIs } from './routes';
 const START_SERVER = () => {
   const app = express();
 
@@ -27,7 +26,9 @@ const START_SERVER = () => {
     res.send('Hello World!');
   });
 
-  app.use('/api', Router);
+  // api
+  app.use('/api', APIs);
+  // -------------------
 
   if (env.BUILD_MODE === 'production') {
     server.listen(process.env.PORT, () => {
@@ -36,7 +37,7 @@ const START_SERVER = () => {
   } else {
     server.listen(env.APP_PORT, env.APP_HOST, () => {
       console.log(
-          `Server is running at http://${env.APP_HOST}:${env.APP_PORT}/`
+        `Server is running at http://${env.APP_HOST}:${env.APP_PORT}/`
       );
     });
   }

@@ -1,3 +1,4 @@
+/* eslint-disable semi */
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { env } from '~/config/environment';
 
