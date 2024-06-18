@@ -111,7 +111,7 @@ const updateData = async (req, res) => {
       .status(StatusCodes.OK)
       .json({ success: true, mgs: 'Cập nhật thông tin thành công' });
   }
-  return res.status(StatusCodes.OK).json({ success: false });
+  return res.status(StatusCodes.OK).json(dataUser);
 };
 export const usersController = {
   getUserID,
