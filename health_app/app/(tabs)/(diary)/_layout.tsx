@@ -8,6 +8,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { Link } from 'expo-router';
+
+import React from 'react';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -17,10 +20,14 @@ SplashScreen.preventAutoHideAsync();
 export default function DiaryLayout() {
 	return (
 		<Stack>
-			<Stack.Screen name="step-counter" />
-			<Stack.Screen name="doctor" />
-			<Stack.Screen name="weight-bmi" />
-			<Stack.Screen name="water-reminder" />
+			<Stack.Screen name="step-counter">
+			</Stack.Screen>
+			<Stack.Screen name="doctor">
+			</Stack.Screen>
+			<Stack.Screen name="weight-bmi">
+			</Stack.Screen>
+			<Stack.Screen name="water-reminder">
+			</Stack.Screen>
 		</Stack>
 	);
 }
