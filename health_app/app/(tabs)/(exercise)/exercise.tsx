@@ -72,7 +72,7 @@ export default function ExerciseIndexScreen() {
 		router.push('detail-exercise/1');
 	};
 	const renderItem = ({ item }: { item: ItemData }) => {
-		const backgroundColor = item.id === selectedId ? '#6e3b6e' : '#f9c2ff';
+		const backgroundColor = item.id === selectedId ? '#388E3C' : '#C8E6C9';
 		const color = item.id === selectedId ? 'white' : 'black';
 
 		return (
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 	},
 	itemExercise: {
-		backgroundColor: '#f9c2ff',
+		backgroundColor: '#C8E6C9',
 		marginVertical: 8,
 		marginHorizontal: 16,
 		padding: 12,

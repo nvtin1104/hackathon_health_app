@@ -17,7 +17,7 @@ SplashScreen.preventAutoHideAsync();
 export default function SettingLayout() {
 	return (
 		<Stack>
-			<Stack.Screen name="explore" options={{ headerShown: false }} />
+			<Stack.Screen name="explore" options={{ headerTitle: 'Cá nhân' }} />
 		</Stack>
 	);
 }
