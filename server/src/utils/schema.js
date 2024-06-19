@@ -49,3 +49,31 @@ export const UPDATE_USER = Joi.object({
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
 });
+
+export const CREATE_WORKOUT_PLAN_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  exercises: Joi.array().required().items(
+    Joi.object({
+      name: Joi.string().required(),
+      time: Joi.number().default(null), // minutes
+      qty: Joi.number().default(null),
+      note: Joi.string().default(null),
+      completed: Joi.boolean().default(false),
+    })
+  ),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+});
+
+export const UPDATE_WORKOUT_PLAN = Joi.object({
+  exercises: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      time: Joi.number().default(0), // minutes
+      qty: Joi.number().default(0),
+      note: Joi.string().default(''),
+      completed: Joi.boolean().default(false),
+    })
+  ),
+  updatedAt: Joi.date().timestamp('javascript').default(Date.now),
+});
