@@ -1,5 +1,7 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import {StyleSheet, Image, Platform, View, Text, TouchableOpacity, ScrollView} from 'react-native';
+import React from 'react';
+import { Dimensions, StyleSheet, Image, Platform, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { BarChart } from 'react-native-chart-kit';
+import { Text as SvgText, G } from 'react-native-svg';
 
 import {Collapsible} from '@/components/Collapsible';
 import {ExternalLink} from '@/components/ExternalLink';
@@ -8,21 +10,34 @@ import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
 import {Link} from 'expo-router';
 import {uri} from "@sideway/address";
-import React from "react";
 
 export default function WeighBMIScreen() {
+
+    const data = {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [
+            {
+                data: [20, 45, 28, 80, 99, 43],
+                color: (opacity = 1) => `rgba(76,175,80, ${opacity})`, // optional
+                strokeWidth: 2 // optional
+            }
+        ],
+        // legend: ["Rainy Days"] // optional
+    };
+
+    const chartConfig = {
+        backgroundGradientFrom: "#fff",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#fff",
+        backgroundGradientToOpacity: 0.5,
+        color: (opacity = 1) => `rgba(126, 126, 126, ${opacity})`,
+        strokeWidth: 2, // optional, default 3
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false // optional
+    };
+
     return (
         <ScrollView style={styles.container}>
-            {/*<View style={styles.header}>*/}
-            {/*    <TouchableOpacity>*/}
-            {/*        <Text style={styles.backButton}>←</Text>*/}
-            {/*    </TouchableOpacity>*/}
-            {/*    <Text style={styles.headerTitle}>Weight & BMI</Text>*/}
-            {/*    <View style={styles.headerIcons}>*/}
-            {/*        <Text style={styles.icon}>⏰</Text>*/}
-            {/*    </View>*/}
-            {/*</View>*/}
-
             <View style={styles.dateRange}>
                 <Text style={styles.dateRangeText}> Detail</Text>
                 <Text style={styles.dateRangeText}>Jun 19,2023 - Jun 19,2024
@@ -50,7 +65,13 @@ export default function WeighBMIScreen() {
                     </View>
                 </View>
                 <View style={styles.chart}>
-                    <Text style={styles.chartValue}>60.0</Text>
+                    <BarChart
+                        data={data}
+                        width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                        height={220}
+                        chartConfig={chartConfig}
+                        fromZero={true}
+                    />
                 </View>
             </View>
 
@@ -71,7 +92,13 @@ export default function WeighBMIScreen() {
                     </View>
                 </View>
                 <View style={styles.chart}>
-                    <Text style={styles.chartValue}>22.0</Text>
+                    <BarChart
+                        data={data}
+                        width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                        height={220}
+                        chartConfig={chartConfig}
+                        fromZero={true}
+                    />
                 </View>
             </View>
 

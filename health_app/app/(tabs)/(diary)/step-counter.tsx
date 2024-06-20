@@ -1,5 +1,8 @@
-import {StyleSheet, View, Text, Image, Platform, SafeAreaView} from 'react-native';
+import {StyleSheet, View, Text, Image, Platform, SafeAreaView, Dimensions} from 'react-native';
 import React from 'react';
+import {
+    BarChart,
+} from "react-native-chart-kit";
 
 import {Collapsible} from '@/components/Collapsible';
 import {ExternalLink} from '@/components/ExternalLink';
@@ -9,7 +12,28 @@ import {ThemedView} from '@/components/ThemedView';
 import {Link} from 'expo-router';
 
 
+
+
 export default function StepCounterScreen() {
+    const data = {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [
+            {
+                data: [0,20, 45, 28, 80, 99, 43],
+            }
+        ]
+    };
+    const chartConfig = {
+        backgroundGradientFrom: "#fff",
+        backgroundGradientFromOpacity: 0,
+        backgroundGradientTo: "#fff",
+        backgroundGradientToOpacity: 0.5,
+        color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
+        strokeWidth: 2, // optional, default 3
+        barPercentage: 0.5,
+        useShadowColorFromDataset: false // optional
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.goalSection}>
@@ -43,8 +67,13 @@ export default function StepCounterScreen() {
             <View style={styles.detailSection}>
                 <Text style={styles.detailTitle}>Detail</Text>
                 <View style={styles.chart}>
-                    {/* Placeholder for the chart */}
-                    <Image source={{uri: 'https://placehold.co/300x150'}} style={styles.chartImage}/>
+                    <BarChart
+                        data={data}
+                        width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                        height={220}
+                        chartConfig={chartConfig}
+                        fromZero={true}
+                    />
                 </View>
             </View>
         </View>
@@ -132,9 +161,4 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignItems: 'center',
     },
-    chartImage: {
-        width: 300,
-        height: 150,
-    },
-
 });
