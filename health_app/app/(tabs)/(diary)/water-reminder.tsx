@@ -1,12 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {View, Text, TouchableOpacity, Image, StyleSheet, Platform, SafeAreaView} from 'react-native';
 import React from 'react';
-import {Collapsible} from '@/components/Collapsible';
-import {ExternalLink} from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
-import {Link} from 'expo-router';
 
 export default function WaterReminderScreen() {
     return (
