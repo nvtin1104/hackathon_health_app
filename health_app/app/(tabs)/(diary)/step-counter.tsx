@@ -1,7 +1,18 @@
-import {Button ,TextInput,StyleSheet, Modal, TouchableOpacity, View, Text, Image, Platform, SafeAreaView, Dimensions} from 'react-native';
+import {Button ,
+    TextInput,
+    StyleSheet,
+    Modal,
+    TouchableOpacity,
+    View,
+    Text,
+    Image,
+    Platform,
+    SafeAreaView,
+    Dimensions} from 'react-native';
 import React, {useState} from 'react';
 import {
     BarChart,
+    PieChart
 } from "react-native-chart-kit";
 
 
@@ -98,7 +109,7 @@ export default function StepCounterScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <Text >Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -110,7 +121,7 @@ export default function StepCounterScreen() {
                                     setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text style={styles.buttonText}>OK</Text>
+                                <Text >OK</Text>
                             </TouchableOpacity>
                         </View>
 
