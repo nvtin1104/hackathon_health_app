@@ -10,8 +10,8 @@ export const SAVE_USER_SCHEMA = Joi.object({
   email: Joi.string()
     .required()
     .email({ tlds: { allow: false } }),
-  tokenGG: Joi.string().required(),
-
+  password: Joi.string().required(),
+  token: Joi.string().default(null),
   name: Joi.string().default(null),
   age: Joi.number().min(1).max(100).default(null),
   gender: Joi.number().default(3).min(1).max(3),
@@ -51,16 +51,21 @@ export const UPDATE_USER = Joi.object({
 });
 
 export const CREATE_WORKOUT_PLAN_SCHEMA = Joi.object({
-  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-  exercises: Joi.array().required().items(
-    Joi.object({
-      name: Joi.string().required(),
-      time: Joi.number().default(null), // minutes
-      qty: Joi.number().default(null),
-      note: Joi.string().default(null),
-      completed: Joi.boolean().default(false),
-    })
-  ),
+  userId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
+  exercises: Joi.array()
+    .required()
+    .items(
+      Joi.object({
+        name: Joi.string().required(),
+        time: Joi.number().default(null), // minutes
+        qty: Joi.number().default(null),
+        note: Joi.string().default(null),
+        completed: Joi.boolean().default(false),
+      })
+    ),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
 });
