@@ -11,45 +11,31 @@ import {
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
 import { request } from '@/utils/request';
+import { useSession } from '@/auth/ctx';
+import { router } from 'expo-router';
 
 export default function SignIn() {
+	const { signIn } = useSession();
 	const [password, onChangePassword] = useState('');
 	const [email, onChangeText] = useState('');
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
 	const handleLogin = () => {
-		// request({
-		// 	url: 'users',
-		// 	token: '',
-		// 	method: 'POST',
-		// 	dataRequest: JSON.stringify({ email, password }),
-		// 	setData: () => {
-		// 		Alert.alert('Success', 'Đăng nhập thành công.');
-		// 	},
-		// 	setLoading: () => {},
-		// 	setError: (error) => {
-		// 		console.error(error);
-		// 	},
-		// });
-		fetch('http://localhost:8000/api/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const json = await response.json(); // Đợi phản hồi JSON từ server
-        console.log('Response:', json); // Log dữ liệu nhận được từ server
-        Alert.alert('Success', 'Đăng nhập thành công.');
-      })
-      .catch((error) => {
-        console.error('Error:', error); // Log lỗi nếu có
-        Alert.alert('Error', 'Đăng nhập thất bại. Vui lòng thử lại.');
-      });
-    
+		request({
+			url: 'users',
+			token: '',
+			method: 'POST',
+			dataRequest: JSON.stringify({ email, password }),
+			setData: (data) => {
+				Alert.alert('Success', 'Đăng nhập thành công.');
+				console.log('Response:', data); // Log dữ liệu nhận được từ server
+				signIn(data);
+				router.replace('/');
+			},
+			setLoading: () => {},
+			setError: (error) => {
+				console.error(error);
+			},
+		});
 	};
 	type Errors = {
 		email?: string;
