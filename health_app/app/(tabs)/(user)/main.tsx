@@ -14,11 +14,14 @@ import {
 	VirtualizedList,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { useSession } from '@/auth/ctx';
+import { useStorageState } from '@/auth/useStorageState';
 
 type ItemData = {
 	id: string;
 	title: string;
 	icon: any;
+	hidden?: boolean;
 };
 const DATA: ItemData[] = [
 	{
@@ -49,9 +52,15 @@ const DATA2: ItemData[] = [
 		icon: 'alert-circle-outline',
 	},
 	{
-		id: 'bd7acbea-c1da-46c2-aed5-3ad533bb28ba',
+		id: 'tas',
 		title: 'Điều khoản và dịch vụ',
 		icon: 'book-outline',
+	},
+	{
+		id: 'log-out',
+		title: 'Đăng xuất',
+		icon: 'exit-outline',
+		hidden: true,
 	},
 ];
 
@@ -65,21 +74,41 @@ const Item = ({ item, onPress }: ItemProps) => (
 			<Iconic name={item.icon} style={styles.icon} />
 			<Text style={[styles.label]}>{item.title}</Text>
 		</View>
-		<FontAwesome
-			name="angle-right"
-			size={24}
-			color="black"
-			style={styles.icon}
-		/>
+		{item.hidden !== true && (
+			<FontAwesome name="chevron-right" size={16} color="black" />
+		)}
 	</TouchableOpacity>
 );
 export default function UserMainScreen() {
-	const [selectedId, setSelectedId] = useState<string>();
-	const handlePress = () => {
-		router.push('detail-exercise/1');
+	const { signOut } = useSession();
+	const [[isLoading, session], setSession] = useStorageState('session');
+	const handlePress = (id: string) => {
+		switch (id) {
+			case 'log-out':
+				Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+					{
+						text: 'Hủy',
+						style: 'cancel',
+					},
+					{
+						text: 'Đăng xuất',
+						onPress: () => {
+							signOut();
+							router.replace('/sign-in');
+						},
+					},
+				]);
+				break;
+			case 'tas':
+				console.log(session);
+				break;
+			default:
+				console.log('default');
+				break;
+		}
 	};
 	const renderItem = ({ item }: { item: ItemData }) => {
-		return <Item item={item} onPress={() => setSelectedId(item.id)} />;
+		return <Item item={item} onPress={() => handlePress(item.id)} />;
 	};
 	return (
 		<ThemedView style={styles.container}>
@@ -89,7 +118,6 @@ export default function UserMainScreen() {
 					data={DATA}
 					renderItem={renderItem}
 					keyExtractor={(item) => item.id}
-					extraData={selectedId}
 				/>
 			</View>
 			<View>
@@ -98,7 +126,6 @@ export default function UserMainScreen() {
 					data={DATA2}
 					renderItem={renderItem}
 					keyExtractor={(item) => item.id}
-					extraData={selectedId}
 				/>
 			</View>
 		</ThemedView>
