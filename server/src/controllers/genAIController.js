@@ -195,7 +195,7 @@ const genGPTAIWorkoutPlan = async (req, res) => {
           name: vietnamese string,
           time: vietnamese string (time(quantity) / minutes),
           note: vietnamese string (details how to perform the exercise, time, space, quantity, intensity, future intensity),
-          practice: vietnamese string (detailed step by step to perform this exercise)
+          practice: vietnamese string (detailed step by step to perform this exercise),
         },
         ...
       ]
@@ -222,14 +222,8 @@ const genGPTAIWorkoutPlan = async (req, res) => {
     );
 
     const messageContent = response.data.choices[0].message.content;
-
     const data = JSON.parse(messageContent);
-
     const result = await workoutPlanModel.updateByUserId(req.user.user_id, { exercises: data.exercises, updatedAt: Date.now() });
-
-    if (!data) {
-      return res.status(StatusCodes.OK).json({ success: false, msg: 'Không convert qua JSON được' });
-    }
 
     return res.status(StatusCodes.OK).json({ success: true, data: result });
   } catch (error) {

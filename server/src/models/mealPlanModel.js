@@ -83,7 +83,7 @@ const remove = async (id) => {
   }
 };
 
-export default {
+export const mealPlanModel = {
   getAll,
   getAllByUserId,
   findOne,
