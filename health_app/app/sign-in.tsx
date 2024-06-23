@@ -7,12 +7,14 @@ import {
 	Text,
 	Button,
 	Alert,
+	ToastAndroid,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
 import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
+import { showToast } from '@/utils/toast';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function SignIn() {
@@ -20,6 +22,7 @@ export default function SignIn() {
 	const [password, onChangePassword] = useState('');
 	const [email, onChangeText] = useState('');
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
+
 	const handleLogin = () => {
 		fetch(`${apiUrl}/users`, {
 			method: 'POST',
@@ -27,9 +30,8 @@ export default function SignIn() {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				// Add necessary login credentials here
-				email: 'yourUsername', // Replace with actual username
-				password: 'yourPassword', // Replace with actual password
+				email, // Replace with actual username
+				password, // Replace with actual password
 			}),
 		})
 			.then((response) => {
@@ -44,20 +46,20 @@ export default function SignIn() {
 					if (data.error) {
 						Alert.alert('Error', data.error);
 					} else {
-						console.log(data);
-						// Handle successful login here
-						// signIn(data); // Uncomment and replace with your actual sign-in function
-						// router.push('Home'); // Uncomment and replace with your actual navigation method
+						if (data.success === true) {
+							showToast(data.message);
+							signIn(data.userData);
+							router.replace('/');
+						} else {
+							showToast(data.message);
+						}
 					}
 				} catch (error) {
-					console.error('Failed to parse JSON:', error);
-					console.error('Response text was:', text);
 					Alert.alert('Error', 'Failed to parse server response');
 				}
 			})
 			.catch((error) => {
 				Alert.alert('Error', error.message);
-				console.error('Error:', error);
 			});
 	};
 
