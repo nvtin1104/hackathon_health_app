@@ -24,11 +24,24 @@ import CircularProgress from "react-native-circular-progress-indicator";
 
 
 export default function StepCounterScreen() {
+    // counter
+    const [PedomaterAvailability, SetPedomaterAvailability] = useState("");
+    const [StepCount, SetStepCount] = useState(0);
+    let WindowHeight = Dimensions.get("window").height;
+    let Dist = StepCount / 1300;
+    let DistanceCovered = Dist.toFixed(4);
+    let cal = DistanceCovered * 60;
+    let caloriesBurnt = cal.toFixed(4);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+
+
+    const stepData = [StepCount, StepCount, StepCount, StepCount, StepCount, StepCount, StepCount]; // replace this with actual data
+
     const data = {
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         datasets: [
             {
-                data: [0, 20, 45, 28, 80, 99, 43],
+                data: stepData,
             }
         ]
     };
@@ -43,17 +56,6 @@ export default function StepCounterScreen() {
         useShadowColorFromDataset: false // optional
     };
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [inputValue, setInputValue] = useState('');
-
-    // counter
-    const [PedomaterAvailability, SetPedomaterAvailability] = useState("");
-    const [StepCount, SetStepCount] = useState(0);
-    let WindowHeight = Dimensions.get("window").height;
-    let Dist = StepCount / 1300;
-    let DistanceCovered = Dist.toFixed(4);
-    let cal = DistanceCovered * 60;
-    let caloriesBurnt = cal.toFixed(4);
 
     const requestAndroidPermission = async () => {
         try {
@@ -119,7 +121,7 @@ export default function StepCounterScreen() {
                     <CircularProgress
                         value={StepCount}
                         maxValue={6500}
-                        radius={210}
+                        radius={150}
                         textColor={"#ecf0f1"}
                         activeStrokeColor={"#000"}
                         inActiveStrokeColor={"#4CAF50"}
