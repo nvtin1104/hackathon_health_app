@@ -13,6 +13,7 @@ import { colorTheme } from '@/utils/colors';
 import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function SignIn() {
 	const { signIn } = useSession();
@@ -20,23 +21,46 @@ export default function SignIn() {
 	const [email, onChangeText] = useState('');
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
 	const handleLogin = () => {
-		request({
-			url: 'users',
-			token: '',
+		fetch(`${apiUrl}/users`, {
 			method: 'POST',
-			dataRequest: JSON.stringify({ email, password }),
-			setData: (data) => {
-				Alert.alert('Success', 'Đăng nhập thành công.');
-				console.log('Response:', data); // Log dữ liệu nhận được từ server
-				signIn(data);
-				router.replace('/');
+			headers: {
+				'Content-Type': 'application/json',
 			},
-			setLoading: () => {},
-			setError: (error) => {
-				console.error(error);
-			},
-		});
+			body: JSON.stringify({
+				// Add necessary login credentials here
+				email: 'yourUsername', // Replace with actual username
+				password: 'yourPassword', // Replace with actual password
+			}),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text(); // Get the raw response text
+			})
+			.then((text) => {
+				try {
+					const data = JSON.parse(text); // Attempt to parse the response as JSON
+					if (data.error) {
+						Alert.alert('Error', data.error);
+					} else {
+						console.log(data);
+						// Handle successful login here
+						// signIn(data); // Uncomment and replace with your actual sign-in function
+						// router.push('Home'); // Uncomment and replace with your actual navigation method
+					}
+				} catch (error) {
+					console.error('Failed to parse JSON:', error);
+					console.error('Response text was:', text);
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+				console.error('Error:', error);
+			});
 	};
+
 	type Errors = {
 		email?: string;
 		password?: string;
