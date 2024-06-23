@@ -115,7 +115,7 @@ const updateById = async (id, data) => {
       );
 
     delete result.tokenGG;
-    
+
     return result;
   } catch (error) {
     return {
