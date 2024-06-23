@@ -1,5 +1,16 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {View, Text, TouchableOpacity, Image, StyleSheet, Platform, SafeAreaView, Modal, TextInput} from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    Image,
+    StyleSheet,
+    Platform,
+    SafeAreaView,
+    Modal,
+    TextInput,
+    ScrollView
+} from 'react-native';
 import React, {useState} from 'react';
 import {ThemedView} from '@/components/ThemedView';
 
@@ -11,47 +22,54 @@ export default function WaterReminderScreen() {
 
     return (
         <>
-            <ThemedView style={styles.container}>
-                <View style={styles.container}>
-                    <Text style={styles.waterAmount}>0ml</Text>
-                    <View style={styles.infoBox}>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Daily Goal:</Text>
-                            <TouchableOpacity onPress={() => setModalVisible(true)}>
-                                <Text style={styles.infoValue}>2000ml
-                                    <Image
-                                        source={{uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg'}}
-                                        style={styles.editIcon}/>
-                                </Text>
+            <ScrollView>
+                <ThemedView style={styles.container}>
+                    <View style={styles.container}>
+                        <Text style={styles.waterAmount}>0 lít</Text>
+                        <View style={styles.infoBox}>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Daily Goal:</Text>
+                                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                                    <Text style={styles.infoValue}>2 lít
+                                        <Image
+                                            source={{uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg'}}
+                                            style={styles.editIcon}/>
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Last Drink:</Text>
+                                <Text style={styles.infoValue}>--l</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Number:</Text>
+                                <Text style={styles.infoValue}>0 Cup</Text>
+                            </View>
+                            <TouchableOpacity style={styles.historyButton}>
+                                <Text style={styles.historyText}>History and Statistics</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Last Drink:</Text>
-                            <Text style={styles.infoValue}>--ml</Text>
-                        </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Number:</Text>
-                            <Text style={styles.infoValue}>0 Cup</Text>
-                        </View>
-                        <TouchableOpacity style={styles.historyButton}>
-                            <Text style={styles.historyText}>History and Statistics</Text>
+                        <TouchableOpacity style={styles.recordButton}>
+                            <Text style={styles.recordText}>Tap Here to record your first drink today!</Text>
                         </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity style={styles.recordButton}>
-                        <Text style={styles.recordText}>Tap Here to record your first drink today!</Text>
-                    </TouchableOpacity>
-                    <View style={styles.footer}>
-                        <TouchableOpacity style={styles.minusButton}>
-                            <Text style={styles.minusText}>-</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.addButton}>
+                        <View style={styles.footer}>
+                            <TouchableOpacity style={styles.minusButton}>
+                                <Text style={styles.minusText}>-</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.addButton}>
 
-                            <Image source={require('../../../assets/images/plusglass.png')} style={styles.addIcon}/>
-                        </TouchableOpacity>
-                        <Text style={styles.footerText}>200ml</Text>
+                                <Image source={require('../../../assets/images/plusglass.png')} style={styles.addIcon}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.plusButton}>
+                                <Image source={{uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUrIYhKJ-HYV8DYjUYD7UFKFGBAAJo4QlwT0fDBKLPHA1Nxwxh"}}
+                                       style={styles.addIcon}/>
+                                <Text style={styles.footerText}>200ml</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-            </ThemedView>
+                </ThemedView>
+
+            </ScrollView>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -72,7 +90,7 @@ export default function WaterReminderScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <Text >Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -84,7 +102,7 @@ export default function WaterReminderScreen() {
                                     setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text style={styles.buttonText}>OK</Text>
+                                <Text >OK</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -103,7 +121,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         width: '100%',
-    height: '100%',
+        height: '100%',
     },
     header: {
         flexDirection: 'row',
@@ -185,6 +203,13 @@ const styles = StyleSheet.create({
     editIcon: {
         width: 20,
         height: 20,
+    },
+    plusButton: {
+        backgroundColor: '#fff',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 15,
+        borderRadius: 50,
     },
     modalView: {
         margin: 20,

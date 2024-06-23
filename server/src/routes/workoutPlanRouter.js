@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { workoutPlanController } from '~/controllers/workoutPlanController';
 
 const Router = express.Router();
