@@ -9,7 +9,7 @@ const validateBeforeCreate = async (data) => {
   return await SAVE_USER_SCHEMA.validateAsync(data, { abortEarly: false });
 };
 
-const login = async (dataUser) => {
+const register = async (dataUser) => {
   try {
     const validData = await validateBeforeCreate(dataUser);
     const db = await GET_DB();
@@ -31,6 +31,7 @@ const login = async (dataUser) => {
     };
   }
 };
+
 const updateLogin = async (dataUser) => {
   try {
     const validData = await validateBeforeCreate(dataUser);
@@ -38,7 +39,7 @@ const updateLogin = async (dataUser) => {
     const collection = db.collection('users');
     const result = await collection.updateOne(
       { email: validData.email },
-      { $set: { tokenGG: validData.tokenGG } }
+      { $set: { token: validData.token } }
     );
     return result;
   } catch (error) {
@@ -72,6 +73,39 @@ const getUserID = async (id) => {
 const validateBeforeUpdate = async (data) => {
   return await UPDATE_USER.validateAsync(data, { abortEarly: false });
 };
+
+const update = async (id, dataUser) => {
+  try {
+    const db = await GET_DB();
+    const collection = db.collection('users');
+    let updateFields = {};
+    Object.keys(dataUser).forEach((key) => {
+      if (dataUser[key] !== null && dataUser[key] !== undefined) {
+        updateFields[key] = dataUser[key];
+      }
+    });
+    await validateBeforeUpdate(updateFields);
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateFields }
+    );
+    return result;
+  } catch (error) {
+    if (error.details) {
+      let e = [];
+      error.details.map((mgs) => e.push(mgs.message));
+      return {
+        success: false,
+        mgs: e,
+      };
+    }
+    return {
+      success: false,
+      mgs: 'Có lỗi xảy ra xin thử lại sau',
+    };
+  }
+};
+
 const updateData = async (email, dataUser) => {
   try {
     const db = await GET_DB();
@@ -124,6 +158,23 @@ const updateById = async (id, data) => {
     };
   }
 };
+    
+const changePassWord = async (id, password) => {
+  try {
+    const db = await GET_DB();
+    const collection = db.collection('users');
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { password: password } }
+    );
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      mgs: 'Có lỗi xảy ra xin thử lại sau',
+    };
+  }
+};
 
 const findOneByUserId = async (userId) => {
   try {
@@ -139,11 +190,13 @@ const findOneByUserId = async (userId) => {
 };
 
 export const userModal = {
-  login,
+  register,
   updateLogin,
   getUserEmail,
   getUserID,
   updateData,
   updateById,
   findOneByUserId
+  update,
+  changePassWord,
 };
