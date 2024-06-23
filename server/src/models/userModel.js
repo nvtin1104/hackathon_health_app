@@ -158,7 +158,7 @@ const updateById = async (id, data) => {
     };
   }
 };
-    
+
 const changePassWord = async (id, password) => {
   try {
     const db = await GET_DB();
@@ -196,7 +196,7 @@ export const userModal = {
   getUserID,
   updateData,
   updateById,
-  findOneByUserId
+  findOneByUserId,
   update,
   changePassWord,
 };
