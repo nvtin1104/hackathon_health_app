@@ -1,8 +1,25 @@
-import {Button ,TextInput,StyleSheet, Modal, TouchableOpacity, View, Text, Image, Platform, SafeAreaView, Dimensions} from 'react-native';
-import React, {useState} from 'react';
+import {
+    Button,
+    TextInput,
+    StyleSheet,
+    Modal,
+    TouchableOpacity,
+    View,
+    Text,
+    Image,
+    ImageBackground,
+    Platform,
+    PermissionsAndroid,
+    Dimensions, ScrollView
+} from 'react-native';
+import React, { useEffect, useState } from "react";
 import {
     BarChart,
+    PieChart
 } from "react-native-chart-kit";
+import { StatusBar } from "expo-status-bar";
+import { Pedometer } from "expo-sensors";
+import CircularProgress from "react-native-circular-progress-indicator";
 
 
 
@@ -29,9 +46,63 @@ export default function StepCounterScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
+    // counter
+    const [PedomaterAvailability, SetPedomaterAvailability] = useState("");
+    const [StepCount, SetStepCount] = useState(0);
+    let WindowHeight = Dimensions.get("window").height;
+    let Dist = StepCount / 1300;
+    let DistanceCovered = Dist.toFixed(4);
+    let cal = DistanceCovered * 60;
+    let caloriesBurnt = cal.toFixed(4);
+
+    const requestAndroidPermission = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
+                {
+                    title: "Activity Recognition Permission",
+                    message: "This app needs access to your activity recognition to count your steps.",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("You can use the pedometer");
+            } else {
+                console.log("Pedometer permission denied");
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    };
+
+    useEffect(() => {
+        if (Platform.OS === 'android') {
+            requestAndroidPermission();
+        }
+        subscribe();
+    }, []);
+
+
+    const subscribe = () => {
+        const subscription = Pedometer.watchStepCount((result) => {
+            SetStepCount(result.steps);
+        });
+
+        Pedometer.isAvailableAsync().then(
+            (result) => {
+                SetPedomaterAvailability(String(result));
+            },
+            (error) => {
+                SetPedomaterAvailability(error);
+            }
+        );
+    };
+
     return (
         <>
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
 
                 <View style={styles.goalSection}>
                     <Text style={styles.dailyGoalText}>Daily Goal</Text>
@@ -45,10 +116,23 @@ export default function StepCounterScreen() {
 
                 </View>
                 <View style={styles.progressSection}>
-                    <Text style={styles.steps}>0</Text>
+                    <CircularProgress
+                        value={StepCount}
+                        maxValue={6500}
+                        radius={210}
+                        textColor={"#ecf0f1"}
+                        activeStrokeColor={"#000"}
+                        inActiveStrokeColor={"#4CAF50"}
+                        inActiveStrokeOpacity={0.5}
+                        inActiveStrokeWidth={40}
+                        activeStrokeWidth={40}
+                        title={"Step Count"}
+                        titleColor={"#ecf0f1"}
+                        titleStyle={{ fontWeight: "bold" }}
+                    />
                     <Image source={{uri: 'https://www.iconsdb.com/icons/preview/gray/gas-xxl.png'}}
                            style={styles.fireIcon}/>
-                    <Text style={styles.kcalText}>0.00 Kcal</Text>
+                    <Text style={styles.kcalText}>{caloriesBurnt} Kcal</Text>
                 </View>
                 <View style={styles.statsSection}>
                     <View style={styles.statBox}>
@@ -61,7 +145,7 @@ export default function StepCounterScreen() {
                         <Image
                             source={{uri: 'https://static.vecteezy.com/system/resources/previews/010/833/007/non_2x/arrow-icon-sign-symbol-logo-illustration-vector.jpg'}}
                             style={styles.arrowIcon}/>
-                        <Text style={styles.statText}>0 m</Text>
+                        <Text style={styles.statText}> Distance Covered : {DistanceCovered} km</Text>
                     </View>
                 </View>
                 <View style={styles.detailSection}>
@@ -76,7 +160,8 @@ export default function StepCounterScreen() {
                         />
                     </View>
                 </View>
-            </View>
+            </ScrollView>
+            <StatusBar style="auto" />
 
             <Modal
                 animationType="slide"
@@ -98,7 +183,7 @@ export default function StepCounterScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <Text >Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -110,7 +195,7 @@ export default function StepCounterScreen() {
                                     setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text style={styles.buttonText}>OK</Text>
+                                <Text >OK</Text>
                             </TouchableOpacity>
                         </View>
 
