@@ -103,10 +103,47 @@ const updateData = async (email, dataUser) => {
     };
   }
 };
+
+const updateById = async (id, data) => {
+  try {
+    const result = await GET_DB()
+      .collection('users')
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: data },
+        { returnDocument: 'after' }
+      );
+
+    delete result.tokenGG;
+    
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      mgs: 'Có lỗi xảy ra xin thử lại sau',
+    };
+  }
+};
+
+const findOneByUserId = async (userId) => {
+  try {
+    const collection = await GET_DB().collection('users');
+
+    return await collection.findOne({ _id: new ObjectId(userId) });
+  } catch (error) {
+    return {
+      success: false,
+      mgs: 'Có lỗi xảy ra xin thử được sau',
+    }
+  }
+};
+
 export const userModal = {
   login,
   updateLogin,
   getUserEmail,
   getUserID,
   updateData,
+  updateById,
+  findOneByUserId
 };

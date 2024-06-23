@@ -77,3 +77,14 @@ export const UPDATE_WORKOUT_PLAN = Joi.object({
   ),
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 });
+
+export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  meals: Joi.object({
+    breakfast: Joi.string().default(null),
+    lunch: Joi.string().default(null),
+    dinner: Joi.string().default(null),
+  }),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+});
