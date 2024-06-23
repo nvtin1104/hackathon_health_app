@@ -38,7 +38,7 @@ export default function WeighBMIScreen() {
             <View style={styles.dateRange}>
                 <Text style={styles.dateRangeText}> Detail</Text>
                 <Text
-                    style={styles.dateRangeTextShow}>   {`${selectedDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`} {/* Display the date range */} </Text>
+                    style={styles.dateRangeTextShow}>   {`${selectedDate.toLocaleDateString()} `} {/* Display the date range */} </Text>
                 <Text style={styles.dateRangeText}>
                     <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                         <Image
