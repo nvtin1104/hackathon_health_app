@@ -233,8 +233,124 @@ const genGPTAIWorkoutPlan = async (req, res) => {
   }
 };
 
+const genGPTAIDailyReport = async (req, res) => {
+  try {
+    // Tìm data dailyActivities dựa trên userId
+    // ...
+    // Fake data
+    const fakeData = {
+      sleep: {
+        start: '22:00',
+        end: '06:00',
+        quality: 'good'
+      },
+      water: [
+        {
+          time: '06:00',
+          quantity: '0.2lit'
+        },
+        {
+          time: '12:00',
+          quantity: '0.5lit'
+        },
+        {
+          time: '18:00',
+          quantity: '1.0lit'
+        }
+      ],
+      exercises: [
+        {
+          name: 'Squats',
+          time: '200s',
+        },
+        {
+          name: 'Push-ups',
+          time: '300s',
+        },
+        {
+          name: 'Running',
+          time: '3600s',
+        }
+      ],
+      meal: {
+        breakfast: [
+          {
+            name: 'Cơm trắng',
+            quantity: '200g'
+          },
+          {
+            name: 'Trứng',
+            quantity: '1 quả'
+          }
+        ],
+        lunch: [
+          {
+            name: 'Cơm trắng',
+            quantity: '200g'
+          },
+          {
+            name: 'Thịt gà',
+            quantity: '300g'
+          }
+        ],
+        dinner: [
+          {
+            name: 'Cơm trắng',
+            quantity: '200g'
+          },
+          {
+            name: 'Thịt heo',
+            quantity: '500g'
+          }
+        ]
+      }
+    };
+
+    const question = `You are a healthcare professional. This is my today's activity data: ${JSON.stringify(fakeData)}. Please give me a report.
+    Returns a json string remove \`\`\`json at the beginning,  \`\`\` at the end and \n as
+    {
+      overview: vietnamese string,
+      caloriesConsumed: number,
+      caloriesBurned: number,
+      improveTomorrow: vietnamese string
+    }
+    `;
+
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: question
+          }
+        ],
+        max_tokens: 3896
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const messageContent = response.data.choices[0].message.content;
+    const data = JSON.parse(messageContent);
+
+    return res.status(StatusCodes.OK).json({ success: true, data });
+
+  } catch (error) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ success: false, message: error.message });
+  }
+};
+
 export const genAIController = {
   genGPTAIOverview,
   genGPTAIWorkoutPlan,
-  genGPTAIMealPlan
+  genGPTAIMealPlan,
+  genGPTAIDailyReport
 }
