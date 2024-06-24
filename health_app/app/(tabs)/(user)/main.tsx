@@ -16,6 +16,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { useSession } from '@/auth/ctx';
 import { useStorageState } from '@/auth/useStorageState';
+import { showToast } from '@/utils/toast';
 
 type ItemData = {
 	id: string;
@@ -94,6 +95,7 @@ export default function UserMainScreen() {
 						text: 'Đăng xuất',
 						onPress: () => {
 							signOut();
+							showToast('Đã đăng xuất khỏi hệ thống');
 							router.replace('/sign-in');
 						},
 					},
