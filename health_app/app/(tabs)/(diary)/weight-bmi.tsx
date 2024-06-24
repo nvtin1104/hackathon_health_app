@@ -6,7 +6,6 @@ import RNDateTimePicker from '@react-native-community/datetimepicker';
 export default function WeighBMIScreen() {
 
     const data = {
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         datasets: [
             {
                 data: [20, 45, 28, 80, 99, 43],
