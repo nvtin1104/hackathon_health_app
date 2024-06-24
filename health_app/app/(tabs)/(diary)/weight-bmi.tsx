@@ -6,7 +6,6 @@ import RNDateTimePicker from '@react-native-community/datetimepicker';
 export default function WeighBMIScreen() {
 
     const data = {
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         datasets: [
             {
                 data: [20, 45, 28, 80, 99, 43],
@@ -36,9 +35,9 @@ export default function WeighBMIScreen() {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.dateRange}>
-                <Text style={styles.dateRangeText}> Detail</Text>
+                <Text style={styles.dateRangeText}> Chi tiết</Text>
                 <Text
-                    style={styles.dateRangeTextShow}>   {`${selectedDate.toLocaleDateString()} `} {/* Display the date range */} </Text>
+                    style={styles.dateRangeTextShow}>   {`${selectedDate.toLocaleDateString()} `} {/* Hiển thị khoảng thời gian */} </Text>
                 <Text style={styles.dateRangeText}>
                     <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                         <Image
@@ -57,8 +56,8 @@ export default function WeighBMIScreen() {
                                 setShowDatePicker(Platform.OS === 'ios' ? true : false);
                             }}
                             dateFormat="dayofweek day month"
-                            minimumDate={date} // 7 days before today
-                            maximumDate={new Date()} // Today's date
+                            minimumDate={date} // 7 ngày trước ngày hôm nay
+                            maximumDate={new Date()} // Ngày hôm nay
                         />
                     )}
 
@@ -66,26 +65,26 @@ export default function WeighBMIScreen() {
             </View>
 
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>Weight</Text>
-                <Text style={styles.unit}>Unit: kg</Text>
+                <Text style={styles.cardTitle}>Cân nặng</Text>
+                <Text style={styles.unit}>Đơn vị: kg</Text>
                 <View style={styles.stats}>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Max</Text>
+                        <Text style={styles.statLabel}>Tối đa</Text>
                         <Text style={styles.statValue}>60.0</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Min</Text>
+                        <Text style={styles.statLabel}>Tối thiểu</Text>
                         <Text style={styles.statValue}>60.0</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Average</Text>
+                        <Text style={styles.statLabel}>Trung bình</Text>
                         <Text style={styles.statValue}>60.0</Text>
                     </View>
                 </View>
                 <View style={styles.chart}>
                     <BarChart
                         data={data}
-                        width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                        width={Dimensions.get("window").width - 40} // trừ 40 để thêm một số padding
                         height={220}
                         chartConfig={chartConfig}
                         fromZero={true}
@@ -97,22 +96,22 @@ export default function WeighBMIScreen() {
                 <Text style={styles.cardTitle}>BMI</Text>
                 <View style={styles.stats}>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Max</Text>
+                        <Text style={styles.statLabel}>Tối đa</Text>
                         <Text style={styles.statValue}>22.0</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Min</Text>
+                        <Text style={styles.statLabel}>Tối thiểu</Text>
                         <Text style={styles.statValue}>22.0</Text>
                     </View>
                     <View style={styles.stat}>
-                        <Text style={styles.statLabel}>Average</Text>
+                        <Text style={styles.statLabel}>Trung bình</Text>
                         <Text style={styles.statValue}>22.0</Text>
                     </View>
                 </View>
                 <View style={styles.chart}>
                     <BarChart
                         data={data}
-                        width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                        width={Dimensions.get("window").width - 40} // trừ 40 để thêm một số padding
                         height={220}
                         chartConfig={chartConfig}
                         fromZero={true}
@@ -121,7 +120,7 @@ export default function WeighBMIScreen() {
             </View>
 
             <TouchableOpacity style={styles.addButton}>
-                <Text style={styles.addButtonText}>+ Add Record</Text>
+                <Text style={styles.addButtonText}>+ Thêm bản ghi</Text>
             </TouchableOpacity>
         </ScrollView>
     );

@@ -7,36 +7,63 @@ import {
 	Text,
 	Button,
 	Alert,
+	ToastAndroid,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
 import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
+import { showToast } from '@/utils/toast';
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function SignIn() {
 	const { signIn } = useSession();
 	const [password, onChangePassword] = useState('');
 	const [email, onChangeText] = useState('');
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
+
 	const handleLogin = () => {
-		request({
-			url: 'users',
-			token: '',
+		console.log(apiUrl);
+		fetch(`${apiUrl}/users`, {
 			method: 'POST',
-			dataRequest: JSON.stringify({ email, password }),
-			setData: (data) => {
-				Alert.alert('Success', 'Đăng nhập thành công.');
-				console.log('Response:', data); // Log dữ liệu nhận được từ server
-				signIn(data);
-				router.replace('/');
+			headers: {
+				'Content-Type': 'application/json',
 			},
-			setLoading: () => {},
-			setError: (error) => {
-				console.error(error);
-			},
-		});
+			body: JSON.stringify({
+				email, 
+				password, 
+			}),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text(); // Get the raw response text
+			})
+			.then((text) => {
+				try {
+					const data = JSON.parse(text); // Attempt to parse the response as JSON
+					if (data.error) {
+						Alert.alert('Error', data.error);
+					} else {
+						if (data.success === true) {
+							showToast(data.message);
+							signIn(data.userData);
+							router.replace('/');
+						} else {
+							showToast(data.message);
+						}
+					}
+				} catch (error) {
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+			});
 	};
+
 	type Errors = {
 		email?: string;
 		password?: string;
