@@ -26,7 +26,7 @@ type ItemData = {
 };
 const DATA: ItemData[] = [
 	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+		id: 'profile',
 		title: 'Hồ sơ',
 		icon: 'person-circle-outline',
 	},
@@ -103,6 +103,9 @@ export default function UserMainScreen() {
 				break;
 			case 'tas':
 				console.log(session);
+				break;
+			case 'profile':
+				router.push('/profile');
 				break;
 			default:
 				console.log('default');

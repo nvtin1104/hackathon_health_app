@@ -24,14 +24,15 @@ export default function SignIn() {
 	const [secureTextEntry, setSecureTextEntry] = useState(true);
 
 	const handleLogin = () => {
+		console.log(apiUrl);
 		fetch(`${apiUrl}/users`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				email, // Replace with actual username
-				password, // Replace with actual password
+				email, 
+				password, 
 			}),
 		})
 			.then((response) => {
