@@ -20,6 +20,24 @@ export default function WaterReminderScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
+    const handleInputChangeAndValidate = (text) => {
+        setInputValue(text);
+        validateInput(text);
+    }
+
+    const validateInput = (text) => {
+        const value = Number(text);
+        if (isNaN(value)) {
+            console.log("Input is not a number");
+            return false;
+        }
+        if (value < 500 || value > 10000) {
+            console.log("Input is out of range (500-10000)");
+            return false;
+        }
+        console.log("Input is valid");
+        return true;
+    }
     return (
         <>
             <ScrollView contentContainerStyle={styles.container} >
@@ -78,8 +96,9 @@ export default function WaterReminderScreen() {
                     <View style={styles.modalContainer}>
                         <TextInput
                             style={styles.input}
-                            onChangeText={text => setInputValue(text)}
+                            onChangeText={handleInputChangeAndValidate}
                             value={inputValue}
+                            placeholder={"500-10000"}
                         />
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
@@ -94,8 +113,11 @@ export default function WaterReminderScreen() {
                                     backgroundColor: inputValue === '' ? '#ccc' : '#4CAF50',
                                 }}
                                 onPress={() => {
-                                    // Handle OK button press
-                                    setModalVisible(!modalVisible);
+                                    // Validate the input when the button is pressed
+                                    if (validateInput(inputValue)) {
+                                        // If the input is valid, close the modal
+                                        setModalVisible(!modalVisible);
+                                    }
                                 }}
                             >
                                 <Text >Đồng ý</Text>

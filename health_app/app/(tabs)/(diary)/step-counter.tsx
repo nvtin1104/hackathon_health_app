@@ -35,8 +35,26 @@ export default function StepCounterScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
+    const handleInputChange = (text: string) => {
+        setInputValue(text);
+    }
 
-    const stepData = [StepCount, 0, 0, 0, 0, 0, 0]; // replace this with actual data
+
+    const stepData = [StepCount, StepCount, StepCount, StepCount, StepCount, StepCount, StepCount]; // replace this with actual data
+
+    const validateInput = () => {
+        const value = Number(inputValue);
+        if (isNaN(value)) {
+            alert("Input is not a number");
+            setInputValue('');
+            return;
+        }
+        if (value < 500 || value > 90000) {
+            alert("pls enter a number between 500 and 90000");
+            setInputValue('');
+            return;
+        }
+    }
 
     const data = {
         datasets: [
@@ -105,8 +123,9 @@ export default function StepCounterScreen() {
     return (
         <>
             <ScrollView style={styles.container}>
+
                 <View style={styles.goalSection}>
-                    <Text style={styles.dailyGoalText}>Mục tiêu hàng ngày</Text>
+                    <Text style={styles.dailyGoalText}>Daily Goal</Text>
                     <TouchableOpacity style={styles.goalSection} onPress={() => setModalVisible(true)}>
                         <Text style={styles.goalNumber}>6000</Text>
                         <Image
@@ -127,7 +146,7 @@ export default function StepCounterScreen() {
                         inActiveStrokeOpacity={0.5}
                         inActiveStrokeWidth={40}
                         activeStrokeWidth={40}
-                        title={"Số bước đi"}
+                        title={"Step Count"}
                         titleColor={"#ecf0f1"}
                         titleStyle={{ fontWeight: "bold" }}
                     />
@@ -146,11 +165,11 @@ export default function StepCounterScreen() {
                         <Image
                             source={{uri: 'https://static.vecteezy.com/system/resources/previews/010/833/007/non_2x/arrow-icon-sign-symbol-logo-illustration-vector.jpg'}}
                             style={styles.arrowIcon}/>
-                        <Text style={styles.statText}> Khoảng cách đã đi : {DistanceCovered} km</Text>
+                        <Text style={styles.statText}> Distance Covered : {DistanceCovered} km</Text>
                     </View>
                 </View>
                 <View style={styles.detailSection}>
-                    <Text style={styles.detailTitle}>Chi tiết</Text>
+                    <Text style={styles.detailTitle}>Detail</Text>
                     <View style={styles.chart}>
                         <BarChart
                             data={data}
@@ -176,28 +195,28 @@ export default function StepCounterScreen() {
                     <View style={styles.modalContainer}>
                         <TextInput
                             style={styles.input}
-                            onChangeText={text => setInputValue(text)}
+                            onChangeText={handleInputChange}
                             value={inputValue}
+                            placeholder={"500-90000"}
                         />
+
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text >Hủy</Text>
+                                <Text >Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{
-                                    ...styles.okButton,
-                                    backgroundColor: inputValue === '' ? '#ccc' : '#4CAF50',
-                                }}
+                            <Button
+                                style={styles.okButton}
+                                title="OK"
+                                color={inputValue === '' ? '#ccc' : '#4CAF50'}
                                 onPress={() => {
                                     // Handle OK button press
+                                    validateInput();
                                     setModalVisible(!modalVisible);
                                 }}
-                            >
-                                <Text >Đồng ý</Text>
-                            </TouchableOpacity>
+                            />
                         </View>
 
                     </View>
