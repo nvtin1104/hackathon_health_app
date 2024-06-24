@@ -35,8 +35,26 @@ export default function StepCounterScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
+    const handleInputChange = (text: string) => {
+        setInputValue(text);
+    }
+
 
     const stepData = [StepCount, StepCount, StepCount, StepCount, StepCount, StepCount, StepCount]; // replace this with actual data
+
+    const validateInput = () => {
+        const value = Number(inputValue);
+        if (isNaN(value)) {
+            alert("Input is not a number");
+            setInputValue('');
+            return;
+        }
+        if (value < 500 || value > 90000) {
+            alert("pls enter a number between 500 and 90000");
+            setInputValue('');
+            return;
+        }
+    }
 
     const data = {
         datasets: [
@@ -177,9 +195,11 @@ export default function StepCounterScreen() {
                     <View style={styles.modalContainer}>
                         <TextInput
                             style={styles.input}
-                            onChangeText={text => setInputValue(text)}
+                            onChangeText={handleInputChange}
                             value={inputValue}
+                            placeholder={"500-90000"}
                         />
+
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
@@ -187,18 +207,16 @@ export default function StepCounterScreen() {
                             >
                                 <Text >Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{
-                                    ...styles.okButton,
-                                    backgroundColor: inputValue === '' ? '#ccc' : '#4CAF50',
-                                }}
+                            <Button
+                                style={styles.okButton}
+                                title="OK"
+                                color={inputValue === '' ? '#ccc' : '#4CAF50'}
                                 onPress={() => {
                                     // Handle OK button press
+                                    validateInput();
                                     setModalVisible(!modalVisible);
                                 }}
-                            >
-                                <Text >OK</Text>
-                            </TouchableOpacity>
+                            />
                         </View>
 
                     </View>
