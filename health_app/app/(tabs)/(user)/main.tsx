@@ -31,7 +31,7 @@ const DATA: ItemData[] = [
 		icon: 'person-circle-outline',
 	},
 	{
-		id: 'bd7acbea-s1b1-46c2-aed5-3ad53abb28ba',
+		id: 'parameter',
 		title: 'Thông số',
 		icon: 'person-outline',
 	},
@@ -100,6 +100,9 @@ export default function UserMainScreen() {
 						},
 					},
 				]);
+				break;
+			case 'parameter':
+				router.push('/parameter');
 				break;
 			case 'tas':
 				console.log(session);
