@@ -22,13 +22,11 @@ export default function WaterReminderScreen() {
 
     return (
         <>
-            <ScrollView>
-                <ThemedView style={styles.container}>
-                    <View style={styles.container}>
-                        <Text style={styles.waterAmount}>0 lít</Text>
+            <ScrollView contentContainerStyle={styles.container} >
+                <Text style={styles.waterAmount}>0 lít</Text>
                         <View style={styles.infoBox}>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoText}>Daily Goal:</Text>
+                                <Text style={styles.infoText}>Mục tiêu hàng ngày:</Text>
                                 <TouchableOpacity onPress={() => setModalVisible(true)}>
                                     <Text style={styles.infoValue}>2 lít
                                         <Image
@@ -38,19 +36,19 @@ export default function WaterReminderScreen() {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoText}>Last Drink:</Text>
+                                <Text style={styles.infoText}>Lần uống cuối:</Text>
                                 <Text style={styles.infoValue}>--l</Text>
                             </View>
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoText}>Number:</Text>
-                                <Text style={styles.infoValue}>0 Cup</Text>
+                                <Text style={styles.infoText}>Số lượng:</Text>
+                                <Text style={styles.infoValue}>0 Cốc</Text>
                             </View>
                             <TouchableOpacity style={styles.historyButton}>
-                                <Text style={styles.historyText}>History and Statistics</Text>
+                                <Text style={styles.historyText}>Lịch sử và thống kê</Text>
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity style={styles.recordButton}>
-                            <Text style={styles.recordText}>Tap Here to record your first drink today!</Text>
+                            <Text style={styles.recordText}>Nhấn vào đây để ghi lại lần uống đầu tiên hôm nay!</Text>
                         </TouchableOpacity>
                         <View style={styles.footer}>
                             <TouchableOpacity style={styles.minusButton}>
@@ -66,8 +64,6 @@ export default function WaterReminderScreen() {
                                 <Text style={styles.footerText}>200ml</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
-                </ThemedView>
 
             </ScrollView>
             <Modal
@@ -90,7 +86,7 @@ export default function WaterReminderScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text >Cancel</Text>
+                                <Text >Hủy</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -102,7 +98,7 @@ export default function WaterReminderScreen() {
                                     setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text >OK</Text>
+                                <Text >Đồng ý</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -110,8 +106,6 @@ export default function WaterReminderScreen() {
                 </View>
             </Modal>
         </>
-
-
     );
 }
 
@@ -194,8 +188,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     addIcon: {
-        width: 100,
-        height: 100,
+        width: 50,
+        height: 50,
     },
     footerText: {
         fontSize: 18,

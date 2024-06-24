@@ -36,7 +36,7 @@ export default function StepCounterScreen() {
     const [inputValue, setInputValue] = useState('');
 
 
-    const stepData = [StepCount, StepCount, StepCount, StepCount, StepCount, StepCount, StepCount]; // replace this with actual data
+    const stepData = [StepCount, 0, 0, 0, 0, 0, 0]; // replace this with actual data
 
     const data = {
         datasets: [
@@ -105,9 +105,8 @@ export default function StepCounterScreen() {
     return (
         <>
             <ScrollView style={styles.container}>
-
                 <View style={styles.goalSection}>
-                    <Text style={styles.dailyGoalText}>Daily Goal</Text>
+                    <Text style={styles.dailyGoalText}>Mục tiêu hàng ngày</Text>
                     <TouchableOpacity style={styles.goalSection} onPress={() => setModalVisible(true)}>
                         <Text style={styles.goalNumber}>6000</Text>
                         <Image
@@ -128,7 +127,7 @@ export default function StepCounterScreen() {
                         inActiveStrokeOpacity={0.5}
                         inActiveStrokeWidth={40}
                         activeStrokeWidth={40}
-                        title={"Step Count"}
+                        title={"Số bước đi"}
                         titleColor={"#ecf0f1"}
                         titleStyle={{ fontWeight: "bold" }}
                     />
@@ -147,11 +146,11 @@ export default function StepCounterScreen() {
                         <Image
                             source={{uri: 'https://static.vecteezy.com/system/resources/previews/010/833/007/non_2x/arrow-icon-sign-symbol-logo-illustration-vector.jpg'}}
                             style={styles.arrowIcon}/>
-                        <Text style={styles.statText}> Distance Covered : {DistanceCovered} km</Text>
+                        <Text style={styles.statText}> Khoảng cách đã đi : {DistanceCovered} km</Text>
                     </View>
                 </View>
                 <View style={styles.detailSection}>
-                    <Text style={styles.detailTitle}>Detail</Text>
+                    <Text style={styles.detailTitle}>Chi tiết</Text>
                     <View style={styles.chart}>
                         <BarChart
                             data={data}
@@ -185,7 +184,7 @@ export default function StepCounterScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text >Cancel</Text>
+                                <Text >Hủy</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -197,7 +196,7 @@ export default function StepCounterScreen() {
                                     setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text >OK</Text>
+                                <Text >Đồng ý</Text>
                             </TouchableOpacity>
                         </View>
 
