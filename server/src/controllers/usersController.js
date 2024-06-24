@@ -65,20 +65,20 @@ const register = async (req, res) => {
   if (!email || !password) {
     return res
       .status(StatusCodes.BAD_REQUEST)
-      .json({ success: false, msg: 'Không bỏ trống thông tin' });
+      .json({ success: false, message: 'Không bỏ trống thông tin' });
   }
   const user = await userModal.getUserEmail(email);
   if (user) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: false, msg: 'Tài khoản đã tồn tại' });
+      .json({ success: false, message: 'Tài khoản đã tồn tại' });
   }
 
   const hash = await bcrypt.hashSync(password, 8);
   if (!hash) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: false, msg: 'Có lỗi bảo mật xảy ra' });
+      .json({ success: false, message: 'Có lỗi bảo mật xảy ra' });
   }
   const data = {
     email: email,
@@ -89,11 +89,11 @@ const register = async (req, res) => {
   if (dataUser.acknowledged) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, msg: 'Đăng kí thành công' });
+      .json({ success: true, message: 'Đăng kí thành công' });
   }
   return res
     .status(StatusCodes.OK)
-    .json({ success: false, msg: 'Đăng kí thất bại' });
+    .json({ success: false, message: 'Đăng kí thất bại' });
 };
 
 const login = async (req, res) => {
@@ -101,19 +101,19 @@ const login = async (req, res) => {
   if (!email || !password) {
     return res
       .status(StatusCodes.BAD_REQUEST)
-      .json({ success: false, mgs: 'Không bỏ trống thông tin' });
+      .json({ success: false, message: 'Không bỏ trống thông tin' });
   }
   const user = await userModal.getUserEmail(email);
   if (!user) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: false, msg: 'Sai tài khoản hoặc mật khẩu' });
+      .json({ success: false, message: 'Sai tài khoản hoặc mật khẩu' });
   }
   const checkPass = await bcrypt.compare(password, user.password);
   if (!checkPass) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: false, msg: 'Sai tài khoản hoặc mật khẩu' });
+      .json({ success: false, message: 'Sai tài khoản hoặc mật khẩu' });
   }
   // Token
   const dataToken = {
@@ -135,11 +135,11 @@ const login = async (req, res) => {
   if (dataUser.acknowledged) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Đăng nhập thành công', userData });
+      .json({ success: true, message: 'Đăng nhập thành công', userData });
   }
   return res
     .status(StatusCodes.OK)
-    .json({ success: false, mgs: 'Lỗi đăng nhập' });
+    .json({ success: false, message: 'Lỗi đăng nhập' });
 };
 
 const updateByEmail = async (req, res) => {
@@ -181,9 +181,10 @@ const updateByEmail = async (req, res) => {
   };
   const dataUser = await userModal.updateData(email, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserEmail(email);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };
@@ -203,17 +204,19 @@ const update = async (req, res) => {
     sleep,
     water,
     comment,
+    goal,
+    pathological,
   } = req.body;
   if (!_id) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Không bỏ trống thông tin' });
+      .json({ success: true, message: 'Không bỏ trống thông tin' });
   }
   const user = await userModal.getUserID(_id);
   if (!user) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Không tồn tại người dùng' });
+      .json({ success: true, message: 'Không tồn tại người dùng' });
   }
   const data = {
     name: name || null,
@@ -228,12 +231,15 @@ const update = async (req, res) => {
     sleep: sleep || null,
     water: water || null,
     comment: comment || null,
+    goal: goal || null,
+    pathological: pathological || null,
   };
   const dataUser = await userModal.update(_id, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserID(_id);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };
@@ -244,34 +250,36 @@ const changePassWord = async (req, res) => {
   if (!_id || !password) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Không bỏ trống thông tin' });
+      .json({ success: true, message: 'Không bỏ trống thông tin' });
   }
   const user = await userModal.getUserID(_id);
   if (!user) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Không tồn tại người dùng' });
+      .json({ success: true, message: 'Không tồn tại người dùng' });
   }
   const hash = await bcrypt.hashSync(password, 8);
   if (!hash) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: false, msg: 'Có lỗi bảo mật xảy ra' });
+      .json({ success: false, message: 'Có lỗi bảo mật xảy ra' });
   }
   const dataUser = await userModal.changePassWord(_id, hash);
   if (dataUser.acknowledged) {
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, mgs: 'Đổi mật khẩu thành công' });
+      .json({ success: true, message: 'Đổi mật khẩu thành công' });
   }
   return res
     .status(StatusCodes.OK)
-    .json({ success: false, msg: 'Có lỗi xảy ra xin thử lại sau' });
+    .json({ success: false, message: 'Có lỗi xảy ra xin thử lại sau' });
 };
 
 const test = async (req, res) => {
   const { _id, email } = req.user;
-  return res.status(StatusCodes.OK).json({ success: true, msg: _id, email });
+  return res
+    .status(StatusCodes.OK)
+    .json({ success: true, message: _id, email });
 };
 
 export const usersController = {

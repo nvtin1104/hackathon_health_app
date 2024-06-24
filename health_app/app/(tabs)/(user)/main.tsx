@@ -16,6 +16,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { useSession } from '@/auth/ctx';
 import { useStorageState } from '@/auth/useStorageState';
+import { showToast } from '@/utils/toast';
 
 type ItemData = {
 	id: string;
@@ -25,12 +26,12 @@ type ItemData = {
 };
 const DATA: ItemData[] = [
 	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+		id: 'profile',
 		title: 'Hồ sơ',
 		icon: 'person-circle-outline',
 	},
 	{
-		id: 'bd7acbea-s1b1-46c2-aed5-3ad53abb28ba',
+		id: 'parameter',
 		title: 'Thông số',
 		icon: 'person-outline',
 	},
@@ -94,13 +95,20 @@ export default function UserMainScreen() {
 						text: 'Đăng xuất',
 						onPress: () => {
 							signOut();
+							showToast('Đã đăng xuất khỏi hệ thống');
 							router.replace('/sign-in');
 						},
 					},
 				]);
 				break;
+			case 'parameter':
+				router.push('/parameter');
+				break;
 			case 'tas':
 				console.log(session);
+				break;
+			case 'profile':
+				router.push('/profile');
 				break;
 			default:
 				console.log('default');
