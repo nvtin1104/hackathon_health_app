@@ -138,6 +138,7 @@ const updateData = async (email, dataUser) => {
   }
 };
 
+
 const updateById = async (id, data) => {
   try {
     const result = await GET_DB()
@@ -176,6 +177,7 @@ const changePassWord = async (id, password) => {
   }
 };
 
+
 const findOneByUserId = async (userId) => {
   try {
     const collection = await GET_DB().collection('users');
@@ -189,12 +191,14 @@ const findOneByUserId = async (userId) => {
   }
 };
 
+
 export const userModal = {
   register,
   updateLogin,
   getUserEmail,
   getUserID,
   updateData,
+
   updateById,
   findOneByUserId,
   update,
