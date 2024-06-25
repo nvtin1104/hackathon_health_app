@@ -39,10 +39,12 @@ const findOne = async (id) => {
 
 const create = async (data) => {
   try {
-    if (data.userId) {
-      data.userId = new ObjectId(data.userId);
-    }
     const validData = await validateBeforeCreate(data);
+
+    if (validData.userId) {
+      validData.userId = new ObjectId(validData.userId);
+    }
+
     const collection = await GET_DB().collection('mealPlans');
     return await collection.insertOne(validData);
   } catch (error) {

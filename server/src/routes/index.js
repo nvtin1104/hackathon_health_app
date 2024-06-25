@@ -5,6 +5,7 @@ import { workoutPlanApi } from '~/routes/workoutPlanRouter';
 import verifyToken from '~/middlewares';
 import { mealPlanApi } from './mealPlanRouter';
 import { genAIRouter } from './genAIRouter';
+import { dailyActApi } from './dailyActRouter';
 
 const Router = express.Router();
 
@@ -16,6 +17,9 @@ Router.use('/wp', verifyToken, workoutPlanApi);
 
 // Meal Plan
 Router.use('/mp', verifyToken, mealPlanApi);
+
+// Daily Activities
+Router.use('/dlact', verifyToken, dailyActApi);
 
 // GEN AI
 Router.use('/ai', verifyToken, genAIRouter);
