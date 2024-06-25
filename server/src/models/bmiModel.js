@@ -1,18 +1,10 @@
 import { GET_DB } from '~/config/mongodb';
 import { ObjectId } from 'mongodb';
-import { CREATE_WORKOUT_PLAN_SCHEMA, UPDATE_WORKOUT_PLAN } from '~/utils/schema';
+import { CREATE_BMI_SCHEMA } from '~/utils/schema';
 
 const validateBeforeCreate = async (data) => {
   try {
-    return await CREATE_WORKOUT_PLAN_SCHEMA.validateAsync(data, { abortEarly: false });
-  } catch (error) {
-    throw new Error(`Validation Error: ${error.message}`);
-  }
-};
-
-const validateBeforeUpdate = async (data) => {
-  try {
-    return await UPDATE_WORKOUT_PLAN.validateAsync(data, { abortEarly: false });
+    return await CREATE_BMI_SCHEMA.validateAsync(data, { abortEarly: false });
   } catch (error) {
     throw new Error(`Validation Error: ${error.message}`);
   }
@@ -20,7 +12,7 @@ const validateBeforeUpdate = async (data) => {
 
 const getAll = async () => {
   try {
-    const collection = await GET_DB().collection('workoutPlans');
+    const collection = await GET_DB().collection('mealPlans');
     return await collection.find({}).toArray();
   } catch (error) {
     throw new Error(`Database Error: ${error.message}`);
@@ -29,8 +21,8 @@ const getAll = async () => {
 
 const getAllByUserId = async (userId) => {
   try {
-    const collection = await GET_DB().collection('workoutPlans');
-    return await collection.findOne({ userId: new ObjectId(userId) });
+    const collection = await GET_DB().collection('mealPlans');
+    return await collection.find({ userId: new ObjectId(userId) }).toArray();
   } catch (error) {
     throw new Error(`Database Error: ${error.message}`);
   }
@@ -38,13 +30,20 @@ const getAllByUserId = async (userId) => {
 
 const findOne = async (id) => {
   try {
-    const collection = await GET_DB().collection('workoutPlans');
+    const collection = await GET_DB().collection('mealPlans');
     return await collection.findOne({ _id: new ObjectId(id) });
   } catch (error) {
     throw new Error(`Database Error: ${error.message}`);
   }
 };
-
+const get7Time = async (userId) => {
+  try {
+    const collection = await GET_DB().collection('bmi');
+    return await collection.find({ userId: new ObjectId(userId) }).sort({ createdAt: -1 }).limit(7).toArray();
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
+}
 const create = async (data) => {
   try {
     const validData = await validateBeforeCreate(data);
@@ -53,8 +52,9 @@ const create = async (data) => {
       validData.userId = new ObjectId(validData.userId);
     }
 
-    const collection = await GET_DB().collection('workoutPlans');
-    return await collection.insertOne(validData);
+    const collection = await GET_DB().collection('bmi');
+    const result = await collection.insertOne(validData);
+    return await collection.findOne({ _id: result.insertedId });
   } catch (error) {
     throw new Error(`Create Error: ${error.message}`);
   }
@@ -62,9 +62,8 @@ const create = async (data) => {
 
 const update = async (id, data) => {
   try {
-    const validData = await validateBeforeUpdate(data);
-    const collection = await GET_DB().collection('workoutPlans');
-    return await collection.updateOne({ _id: new ObjectId(id) }, { $set: validData });
+    const collection = await GET_DB().collection('mealPlans');
+    return await collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
   } catch (error) {
     throw new Error(`Update Error: ${error.message}`);
   }
@@ -73,11 +72,11 @@ const update = async (id, data) => {
 const updateByUserId = async (userId, data) => {
   try {
     const result = await GET_DB()
-      .collection('workoutPlans')
+      .collection('mealPlans')
       .findOneAndUpdate(
         { userId: new ObjectId(userId) },
         { $set: data },
-        { returnDocument: 'after', upsert: true }
+        { returnDocument: 'after' }
       );
     return result;
   } catch (error) {
@@ -87,19 +86,20 @@ const updateByUserId = async (userId, data) => {
 
 const remove = async (id) => {
   try {
-    const collection = await GET_DB().collection('workoutPlans');
+    const collection = await GET_DB().collection('mealPlans');
     return await collection.deleteOne({ _id: new ObjectId(id) });
   } catch (error) {
     throw new Error(`Delete Error: ${error.message}`);
   }
 };
 
-export default {
+export const bmiModel = {
   getAll,
   getAllByUserId,
   findOne,
   create,
   update,
   updateByUserId,
-  remove
+  remove,
+  get7Time
 };

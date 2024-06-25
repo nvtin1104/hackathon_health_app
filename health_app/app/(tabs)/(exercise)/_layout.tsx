@@ -8,7 +8,7 @@ import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 import { colorTheme } from '@/utils/colors';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -24,6 +24,20 @@ export default function SettingLayout() {
 
 		hideSplashScreen();
 	}, []);
+	const handleCreateExercise = () => {
+		Alert.alert('Tạo bài tập', 'Việc tạo bài tập mới sẽ xóa toàn bộ bài tập có và tiến trình. Bạn có chắc không?', [
+			{
+				text: 'Hủy',
+				style: 'cancel',
+			},
+			{
+				text: 'Có',
+				onPress: () => {
+					router.push('/create-exercise');
+				},
+			},
+		]);
+	};
 
 	return (
 		<Stack>
@@ -34,7 +48,7 @@ export default function SettingLayout() {
 					headerRight: () => (
 						<TouchableOpacity
 							style={styles.button}
-							onPress={() => router.push('/create-exercise')}
+							onPress={handleCreateExercise}
 						>
 							<Text style={styles.buttonText}>Tạo bài tập</Text>
 						</TouchableOpacity>

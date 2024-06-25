@@ -111,3 +111,12 @@ export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
   waters: Joi.array().default([]),
   sleep: Joi.object().default({}),
 })
+
+export const CREATE_BMI_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  date: Joi.date().timestamp('javascript').default(Date.now),
+  height: Joi.number().required(),
+  weight: Joi.number().required(),
+  bmiEvaluation: Joi.string().required(),
+  bmi: Joi.number().required(),
+})
