@@ -1,6 +1,7 @@
 import { ThemedView } from '@/components/ThemedView';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
 	StyleSheet,
@@ -12,11 +13,12 @@ import {
 	Pressable,
 	TextInput,
 	Alert,
+	ScrollView,
 } from 'react-native';
 import { useSession } from '@/auth/ctx';
 import { showToast } from '@/utils/toast';
 import { colorTheme } from '@/utils/colors';
-import { Picker } from '@react-native-picker/picker';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 
 type ItemProps = { title: string; icon: any; style: any };
 
@@ -27,52 +29,78 @@ const Item = ({ title, icon, style }: ItemProps) => (
 	</View>
 );
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const items = [
+	{
+		name: 'Bữa ăn',
+		id: 0,
+		children: [
+			{ name: 'Bữa sáng', id: 10 },
+			{ name: 'Bữa trưa', id: 11 },
+			{ name: 'Bữa tối', id: 12 },
+			{ name: 'Đồ ăn vặt', id: 13 },
+		],
+	},
+	{
+		name: 'Sở thích ăn uống',
+		id: 1,
+		children: [
+			{ name: 'Ăn chay', id: 20 },
+			{ name: 'Ăn chay nguyên liệu', id: 21 },
+			{ name: 'Không gluten', id: 22 },
+			{ name: 'Ăn kiêng Keto', id: 23 },
+			{ name: 'Ăn theo chế độ Paleo', id: 24 },
+		],
+	},
+];
+
 export default function UserProfileScreen() {
 	const [modalVisible, setModalVisible] = useState(false);
+	const [modal2Visible, setModal2Visible] = useState(false);
+
 	const { session, signIn } = useSession();
 	const [name, onChangeName] = useState('');
 	const [gender, setSelectedGender] = useState<string>('1');
 	const [age, onChangeAge] = useState<string>('1');
+	const [weight, onChangeWeight] = useState<string>('');
+	const [height, onChangeHeight] = useState<string>('');
+	const [selectedItems, setSelectedItems] = useState([]);
+
+	const onSelectedItemsChange = (selectedItems: any) => {
+		setSelectedItems(selectedItems);
+	};
 	const data = session ? JSON.parse(session) : null;
 	const [disabled, setDisabled] = useState(false);
-	const renderGender = (id: string) => {
-		switch (id) {
-			case '1':
-				return 'Nam';
-			case '2':
-				return 'Nữ';
-			default:
-				return 'Khác';
-		}
-	};
 
 	useEffect(() => {
 		if (data) {
 			onChangeName(data.name);
 			setSelectedGender(data.gender);
 			onChangeAge(data.age ? String(data.age) : '3');
+			onChangeAge(data.weight ? String(data.weight) : '');
+			onChangeAge(data.height ? String(data.height) : '');
 		}
 	}, []);
 
-	const validateName = (name: string): boolean => {
-		if (!name || name.trim().length < 2) {
-			Alert.alert('Lỗi', 'Tên phải có ít nhất 2 ký tự.');
+	const validateHeight = (height: string): boolean => {
+		const heightNumber = parseFloat(height);
+		if (isNaN(heightNumber) || heightNumber < 50 || heightNumber > 300) {
+			Alert.alert('Lỗi', 'Chiều cao phải là số hợp lệ từ 50 đến 300 cm.');
 			return false;
 		}
 		return true;
 	};
 
-	const validateAge = (age: string): boolean => {
-		const ageNumber = parseInt(age, 10);
-		if (isNaN(ageNumber) || ageNumber < 1 || ageNumber > 120) {
-			Alert.alert('Lỗi', 'Tuổi phải là số hợp lệ từ 1 đến 120.');
+	const validateWeight = (weight: string): boolean => {
+		const weightNumber = parseFloat(weight);
+		if (isNaN(weightNumber) || weightNumber < 3 || weightNumber > 500) {
+			Alert.alert('Lỗi', 'Cân nặng phải là số hợp lệ từ 3 đến 500 kg.');
 			return false;
 		}
 		return true;
 	};
 
 	const handleSave = () => {
-		if (validateName(name) && validateAge(age)) {
+		if (validateHeight(height) && validateWeight(weight)) {
 			setDisabled(true);
 			fetch(`${apiUrl}/users`, {
 				method: 'PUT',
@@ -81,9 +109,8 @@ export default function UserProfileScreen() {
 					Authorization: `Bearer ${data.token}`,
 				},
 				body: JSON.stringify({
-					name,
-					age,
-					gender,
+					height,
+					weight: Number(weight),
 				}),
 			})
 				.then((response) => {
@@ -100,6 +127,7 @@ export default function UserProfileScreen() {
 						} else {
 							if (data.success === true) {
 								showToast(data.message);
+								console.log(data.data);
 								signIn(data.data);
 								setModalVisible(!modalVisible);
 								setDisabled(false);
@@ -114,41 +142,98 @@ export default function UserProfileScreen() {
 				.catch((error) => {
 					Alert.alert('Error', error.message);
 				});
-			// setModalVisible(!modalVisible);
 		}
 	};
+	const handleSaveNutrition = () => {
+		const getAllChildren = (items: any[]) => {
+			return items.flatMap((item: any) => item.children);
+		};
 
+		// Sử dụng hàm để lấy danh sách tất cả các mục con
+		const allChildren = getAllChildren(items);
+		const nutritionArr = selectedItems.map((item) =>
+			allChildren.find((child: any) => child.id === item)
+		);
+		const filteredData = nutritionArr.filter((item) => item !== undefined);
+		const nutrition = filteredData.map((item: any) => item.name).join(', ');
+		setDisabled(true);
+		fetch(`${apiUrl}/users`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${data.token}`,
+			},
+			body: JSON.stringify({
+				nutrition,
+			}),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text(); // Get the raw response text
+			})
+			.then((text) => {
+				try {
+					const data = JSON.parse(text); // Attempt to parse the response as JSON
+					if (data.error) {
+						Alert.alert('Error', data.error);
+					} else {
+						if (data.success === true) {
+							showToast(data.message);
+							signIn(data.data);
+							setModal2Visible(!modal2Visible);
+							setDisabled(false);
+						} else {
+							showToast(data.message);
+						}
+					}
+				} catch (error) {
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+			});
+	};
 	const USER_INFO = [
 		{
 			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: data.name,
-			icon: 'account',
+			title: data.weight ? `${data.weight} kg` : 'Chưa cập nhật',
+			icon: 'weight',
 		},
 		{
 			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: data.email,
-			icon: 'email-outline',
+			title: data.height ? `${data.height} cm` : 'Chưa cập nhật',
+			icon: 'human-male-height',
 		},
 		{
 			id: '58694a0f-3da1-471f-bd96-145571e29e72',
-			title: renderGender(data.gender),
-			icon: 'gender-male-female',
+			title: data.water ? `${data.water} ml` : 'Chưa cập nhật',
+			icon: 'water',
+		},
+		{
+			id: '58694a0f-3da1-471f-bd96-1455s1e29e72',
+			title: data.sleep ? `${data.sleep} h` : 'Chưa cập nhật',
+			icon: 'sleep',
 		},
 		{
 			id: '58694a0f-3da1-471f-bd96-145571e29s72',
-			title: data.age ? `${data.age} tuổi` : 'Chưa cập nhật',
-			icon: 'account-sync-outline',
+			title: data.nutrition ? data.nutrition : 'Chưa cập nhật',
+			icon: 'nutrition',
+		},
+
+		{
+			id: '58694a0f-3da1-471f-bd96-14557de29e72',
+			title: data.fitness ? `${data.fitness} phút` : 'Chưa cập nhật',
+			icon: 'run-fast',
 		},
 	];
 
 	return (
 		<ThemedView style={styles.container}>
-			<View style={styles.mainInfo}>
-				<Text style={styles.name}>{data.name}</Text>
-				<Text style={styles.email}>{data.email}</Text>
-			</View>
 			<View style={styles.secondaryInfo}>
-				<Text style={styles.title}>Thông tin cá nhân</Text>
+				<Text style={styles.title}>Thông số cá nhân</Text>
 				<FlatList
 					data={USER_INFO}
 					renderItem={({ item, index }) => (
@@ -169,7 +254,15 @@ export default function UserProfileScreen() {
 					style={styles.button}
 					onPress={() => setModalVisible(true)}
 				>
-					<Text style={{ color: '#fff' }}>Chỉnh sửa</Text>
+					<Text style={{ color: '#fff' }}>Chỉnh sửa thông số cơ bản</Text>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.buttonContainer}>
+				<TouchableOpacity
+					style={styles.button}
+					onPress={() => setModal2Visible(true)}
+				>
+					<Text style={{ color: '#fff' }}>Chỉnh sửa thói quen ăn uống</Text>
 				</TouchableOpacity>
 			</View>
 			<Modal
@@ -185,28 +278,51 @@ export default function UserProfileScreen() {
 						<Text style={styles.modalText}>Chỉnh sửa thông tin:</Text>
 						<TextInput
 							style={styles.input}
-							onChangeText={(text) => onChangeName(text)}
-							value={name}
-							placeholder="Tên"
+							onChangeText={(text) => onChangeHeight(text)}
+							value={height}
+							placeholder="Chiều cao"
 						/>
 						<TextInput
 							style={styles.input}
-							onChangeText={(text) => onChangeAge(text)}
-							value={age}
-							placeholder="Tuổi"
+							onChangeText={(text) => onChangeWeight(text)}
+							value={weight}
+							placeholder="Cân nặng"
 						/>
-						<Picker
-							style={styles.input}
-							selectedValue={gender}
-							onValueChange={(itemValue) => setSelectedGender(itemValue)}
-						>
-							<Picker.Item label="Nam" value="1" />
-							<Picker.Item label="Nữ" value="2" />
-							<Picker.Item label="Khác" value="3" />
-						</Picker>
 						<Pressable
 							style={[styles.button, styles.buttonClose]}
 							onPress={handleSave}
+							disabled={disabled}
+						>
+							<Text style={styles.textStyle}>Lưu</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modal>
+			<Modal
+				animationType="fade"
+				transparent={true}
+				visible={modal2Visible}
+				onRequestClose={() => {
+					setModal2Visible(!modal2Visible);
+				}}
+			>
+				<View style={styles.centeredView}>
+					<View style={styles.modalView}>
+						<SectionedMultiSelect
+							items={items}
+							IconRenderer={MaterialIcons}
+							uniqueKey="id"
+							subKey="children"
+							selectText="Chọn cái gì đó..."
+							searchPlaceholderText="Tìm kiếm..."
+							confirmText="Chọn"
+							showDropDowns={true}
+							onSelectedItemsChange={onSelectedItemsChange}
+							selectedItems={selectedItems}
+						/>
+						<Pressable
+							style={[styles.button, styles.buttonClose]}
+							onPress={handleSaveNutrition}
 							disabled={disabled}
 						>
 							<Text style={styles.textStyle}>Lưu</Text>

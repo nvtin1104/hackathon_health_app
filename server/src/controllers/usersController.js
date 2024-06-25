@@ -181,9 +181,10 @@ const updateByEmail = async (req, res) => {
   };
   const dataUser = await userModal.updateData(email, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserEmail(email);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, message: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };
@@ -235,9 +236,10 @@ const update = async (req, res) => {
   };
   const dataUser = await userModal.update(_id, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserID(_id);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, message: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };

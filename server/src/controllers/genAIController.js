@@ -3,10 +3,11 @@ import axios from 'axios';
 import { userModal } from '~/models/userModel';
 import workoutPlanModel from '~/models/workoutPlanModel';
 import mealPlanModel from '~/models/mealPlanModel';
+import { dailyActModel } from '~/models/dailyActModel';
 
 const genGPTAIOverview = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water, goal } = user;
 
@@ -62,7 +63,7 @@ const genGPTAIOverview = async (req, res) => {
 
     const data = JSON.parse(messageContent);
 
-    await userModal.updateById(req.user.user_id, { ...data, updatedAt:  Date.now() });
+    await userModal.updateById(req.user._id, { ...data, updatedAt:  Date.now() });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -72,7 +73,7 @@ const genGPTAIOverview = async (req, res) => {
 
 const genGPTAIMealPlan = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water, goal } = user;
 
@@ -149,7 +150,7 @@ const genGPTAIMealPlan = async (req, res) => {
     const messageContent = response.data.choices[0].message.content;
     const data = JSON.parse(messageContent);
 
-    const result = await mealPlanModel.updateByUserId(req.user.user_id, { meals: data, updatedAt: Date.now() });
+    const result = await mealPlanModel.updateByUserId(req.user._id, { meals: data, updatedAt: Date.now() });
 
     if (!data) {
       return res.status(StatusCodes.OK).json({ success: false, msg: 'Không convert qua JSON được' });
@@ -165,7 +166,7 @@ const genGPTAIMealPlan = async (req, res) => {
 
 const genGPTAIWorkoutPlan = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water } = user;
 
@@ -223,7 +224,7 @@ const genGPTAIWorkoutPlan = async (req, res) => {
 
     const messageContent = response.data.choices[0].message.content;
     const data = JSON.parse(messageContent);
-    const result = await workoutPlanModel.updateByUserId(req.user.user_id, { exercises: data.exercises, updatedAt: Date.now() });
+    const result = await workoutPlanModel.updateByUserId(req.user._id, { exercises: data.exercises, updatedAt: Date.now() });
 
     return res.status(StatusCodes.OK).json({ success: true, data: result });
   } catch (error) {
@@ -235,78 +236,9 @@ const genGPTAIWorkoutPlan = async (req, res) => {
 
 const genGPTAIDailyReport = async (req, res) => {
   try {
-    // Tìm data dailyActivities dựa trên userId
-    // ...
-    // Fake data
-    const fakeData = {
-      sleep: {
-        start: '22:00',
-        end: '06:00',
-        quality: 'good'
-      },
-      water: [
-        {
-          time: '06:00',
-          quantity: '0.2lit'
-        },
-        {
-          time: '12:00',
-          quantity: '0.5lit'
-        },
-        {
-          time: '18:00',
-          quantity: '1.0lit'
-        }
-      ],
-      exercises: [
-        {
-          name: 'Squats',
-          time: '200s',
-        },
-        {
-          name: 'Push-ups',
-          time: '300s',
-        },
-        {
-          name: 'Running',
-          time: '3600s',
-        }
-      ],
-      meal: {
-        breakfast: [
-          {
-            name: 'Cơm trắng',
-            quantity: '200g'
-          },
-          {
-            name: 'Trứng',
-            quantity: '1 quả'
-          }
-        ],
-        lunch: [
-          {
-            name: 'Cơm trắng',
-            quantity: '200g'
-          },
-          {
-            name: 'Thịt gà',
-            quantity: '300g'
-          }
-        ],
-        dinner: [
-          {
-            name: 'Cơm trắng',
-            quantity: '200g'
-          },
-          {
-            name: 'Thịt heo',
-            quantity: '500g'
-          }
-        ]
-      }
-    };
+    const dailyActData = await dailyActModel.findOneByUserId(req.user._id);
 
-    const question = `You are a healthcare professional. This is my today's activity data: ${JSON.stringify(fakeData)}. Please give me a report.
+    const question = `You are a healthcare professional. This is my today's activity data: ${JSON.stringify(dailyActData)}. Please give me a report.
     Returns a json string remove \`\`\`json at the beginning,  \`\`\` at the end and \n as
     {
       overview: vietnamese string,
