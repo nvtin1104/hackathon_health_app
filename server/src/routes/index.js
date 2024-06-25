@@ -6,6 +6,7 @@ import verifyToken from '~/middlewares';
 import { mealPlanApi } from './mealPlanRouter';
 import { genAIRouter } from './genAIRouter';
 import { dailyActApi } from './dailyActRouter';
+import { bmiApi } from './bmiRouter';
 
 const Router = express.Router();
 
@@ -17,6 +18,9 @@ Router.use('/wp', verifyToken, workoutPlanApi);
 
 // Meal Plan
 Router.use('/mp', verifyToken, mealPlanApi);
+
+// BMI
+Router.use('/bmi', verifyToken, bmiApi);
 
 // Daily Activities
 Router.use('/dlact', verifyToken, dailyActApi);
