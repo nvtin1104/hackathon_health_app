@@ -7,5 +7,6 @@ export default ({ config }) => {
       apiBaseUrl: process.env.API_BASE_URL,
       apiKey: process.env.API_KEY,
     },
+    
   };
 };
