@@ -15,7 +15,7 @@ const getAll = async (req, res) => {
 
 const getAllByUserId = async (req, res) => {
   try {
-    const { userId } = req.userId;
+    const { userId } = req.user._id;
     const data = await mealPlanModel.getAllByUserId(userId);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
@@ -41,13 +41,13 @@ const findOne = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { user_id } = req.user;
+    const userId = req.user._id;
 
-    if (!user_id) {
+    if (!userId) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
     }
 
-    const data = await mealPlanModel.create({ userId: user_id, ...req.body });
+    const data = await mealPlanModel.create({ userId, ...req.body });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {

@@ -26,12 +26,12 @@ type ItemData = {
 };
 const DATA: ItemData[] = [
 	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+		id: 'profile',
 		title: 'Hồ sơ',
 		icon: 'person-circle-outline',
 	},
 	{
-		id: 'bd7acbea-s1b1-46c2-aed5-3ad53abb28ba',
+		id: 'parameter',
 		title: 'Thông số',
 		icon: 'person-outline',
 	},
@@ -101,8 +101,14 @@ export default function UserMainScreen() {
 					},
 				]);
 				break;
+			case 'parameter':
+				router.push('/parameter');
+				break;
 			case 'tas':
 				console.log(session);
+				break;
+			case 'profile':
+				router.push('/profile');
 				break;
 			default:
 				console.log('default');

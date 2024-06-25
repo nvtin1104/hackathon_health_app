@@ -6,5 +6,6 @@ const Router = express.Router();
 Router.post('/overviewHealth', (req, res) => genAIController.genGPTAIOverview(req, res));
 Router.post('/workoutPlan', (req, res) => genAIController.genGPTAIWorkoutPlan(req, res));
 Router.post('/mealPlan', (req, res) => genAIController.genGPTAIMealPlan(req, res));
+Router.post('/dailyReport', (req, res) => genAIController.genGPTAIDailyReport(req, res));
 
 export const genAIRouter = Router;

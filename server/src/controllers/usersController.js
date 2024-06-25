@@ -181,9 +181,10 @@ const updateByEmail = async (req, res) => {
   };
   const dataUser = await userModal.updateData(email, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserEmail(email);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, message: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };
@@ -203,6 +204,8 @@ const update = async (req, res) => {
     sleep,
     water,
     comment,
+    goal,
+    pathological,
   } = req.body;
   if (!_id) {
     return res
@@ -228,12 +231,15 @@ const update = async (req, res) => {
     sleep: sleep || null,
     water: water || null,
     comment: comment || null,
+    goal: goal || null,
+    pathological: pathological || null,
   };
   const dataUser = await userModal.update(_id, data);
   if (dataUser.acknowledged) {
+    const data = await userModal.getUserID(_id);
     return res
       .status(StatusCodes.OK)
-      .json({ success: true, message: 'Cập nhật thông tin thành công' });
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
   }
   return res.status(StatusCodes.OK).json(dataUser);
 };
@@ -271,7 +277,9 @@ const changePassWord = async (req, res) => {
 
 const test = async (req, res) => {
   const { _id, email } = req.user;
-  return res.status(StatusCodes.OK).json({ success: true, message: _id, email });
+  return res
+    .status(StatusCodes.OK)
+    .json({ success: true, message: _id, email });
 };
 
 export const usersController = {

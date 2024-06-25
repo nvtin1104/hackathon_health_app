@@ -3,10 +3,11 @@ import axios from 'axios';
 import { userModal } from '~/models/userModel';
 import workoutPlanModel from '~/models/workoutPlanModel';
 import mealPlanModel from '~/models/mealPlanModel';
+import { dailyActModel } from '~/models/dailyActModel';
 
 const genGPTAIOverview = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water, goal } = user;
 
@@ -62,7 +63,7 @@ const genGPTAIOverview = async (req, res) => {
 
     const data = JSON.parse(messageContent);
 
-    await userModal.updateById(req.user.user_id, { ...data, updatedAt:  Date.now() });
+    await userModal.updateById(req.user._id, { ...data, updatedAt:  Date.now() });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -72,7 +73,7 @@ const genGPTAIOverview = async (req, res) => {
 
 const genGPTAIMealPlan = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water, goal } = user;
 
@@ -149,7 +150,7 @@ const genGPTAIMealPlan = async (req, res) => {
     const messageContent = response.data.choices[0].message.content;
     const data = JSON.parse(messageContent);
 
-    const result = await mealPlanModel.updateByUserId(req.user.user_id, { meals: data, updatedAt: Date.now() });
+    const result = await mealPlanModel.updateByUserId(req.user._id, { meals: data, updatedAt: Date.now() });
 
     if (!data) {
       return res.status(StatusCodes.OK).json({ success: false, msg: 'Không convert qua JSON được' });
@@ -165,7 +166,7 @@ const genGPTAIMealPlan = async (req, res) => {
 
 const genGPTAIWorkoutPlan = async (req, res) => {
   try {
-    const user = await userModal.findOneByUserId(req.user.user_id);
+    const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water } = user;
 
@@ -223,9 +224,55 @@ const genGPTAIWorkoutPlan = async (req, res) => {
 
     const messageContent = response.data.choices[0].message.content;
     const data = JSON.parse(messageContent);
-    const result = await workoutPlanModel.updateByUserId(req.user.user_id, { exercises: data.exercises, updatedAt: Date.now() });
+    const result = await workoutPlanModel.updateByUserId(req.user._id, { exercises: data.exercises, updatedAt: Date.now() });
 
     return res.status(StatusCodes.OK).json({ success: true, data: result });
+  } catch (error) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ success: false, message: error.message });
+  }
+};
+
+const genGPTAIDailyReport = async (req, res) => {
+  try {
+    const dailyActData = await dailyActModel.findOneByUserId(req.user._id);
+
+    const question = `You are a healthcare professional. This is my today's activity data: ${JSON.stringify(dailyActData)}. Please give me a report.
+    Returns a json string remove \`\`\`json at the beginning,  \`\`\` at the end and \n as
+    {
+      overview: vietnamese string,
+      caloriesConsumed: number,
+      caloriesBurned: number,
+      improveTomorrow: vietnamese string
+    }
+    `;
+
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: question
+          }
+        ],
+        max_tokens: 3896
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const messageContent = response.data.choices[0].message.content;
+    const data = JSON.parse(messageContent);
+
+    return res.status(StatusCodes.OK).json({ success: true, data });
+
   } catch (error) {
     return res
       .status(StatusCodes.BAD_REQUEST)
@@ -236,5 +283,6 @@ const genGPTAIWorkoutPlan = async (req, res) => {
 export const genAIController = {
   genGPTAIOverview,
   genGPTAIWorkoutPlan,
-  genGPTAIMealPlan
+  genGPTAIMealPlan,
+  genGPTAIDailyReport
 }
