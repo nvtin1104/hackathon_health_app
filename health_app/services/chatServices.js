@@ -1,4 +1,4 @@
-import apiClient, { CREATE_CHAT, GET_CHAT_HISTORY } from './setting'
+import apiClient, { CREATE_CHAT, GET_CHAT_HISTORY, CREATE_BOT_ANSWER } from './setting'
 
 // Service to create a new bot
 export const createMessage = async (payload) => {
@@ -38,6 +38,26 @@ export const getChatHistoryByUserIdAndBot = async (payload) => {
     return response.data
   } catch (error) {
     console.error('message', error)
+    throw new Error(error.response ? error.response.data.msg : error.message)
+  }
+}
+
+export const getChatLatest = async () => {
+  try {
+    const response = await apiClient.get(`${GET_CHAT_HISTORY}/message/latest`)
+    return response.data
+  } catch (error) {
+    console.error('message', error)
+    throw new Error(error.response ? error.response.data.msg : error.message)
+  }
+}
+
+export const createAnswerFromBot = async (payload) => {
+  try {
+    const response = await apiClient.post(CREATE_BOT_ANSWER, payload)
+    return response.data
+  } catch (error) {
+    console.log(error)
     throw new Error(error.response ? error.response.data.msg : error.message)
   }
 }

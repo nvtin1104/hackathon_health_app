@@ -23,18 +23,26 @@ const getAllByUserId = async (userId) => {
   return await collection.find({ userId: userId }).toArray();
 }
 
-const findOne = async (id) => {
+const findById = async (id) => {
   const collection = await GET_DB().collection(COLLECTION);
 
   return await collection.findOne({ _id: new ObjectId(id) });
 }
 
 const create = async (data) => {
-  console.log(data)
-  const validData = await validateBeforeCreate(data);
-  const collection = await GET_DB().collection(COLLECTION);
-
-  return await collection.insertOne(validData);
+  try {
+    const validData = await validateBeforeCreate(data);
+    
+    const db = await GET_DB();
+    const collection = db.collection(COLLECTION);
+    
+    const { insertedId } = await collection.insertOne(validData);
+    
+    return await findById(insertedId);
+  } catch (error) {
+    console.error('Error creating document:', error);
+    throw new Error('Failed to create document');
+  }
 }
 
 const update = async (id, data) => {
@@ -53,7 +61,7 @@ const remove = async (id) => {
 export default {
   getAll,
   getAllByUserId,
-  findOne,
+  findById,
   create,
   update,
   remove

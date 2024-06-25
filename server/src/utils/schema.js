@@ -89,6 +89,7 @@ export const UPDATE_WORKOUT_PLAN = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 });
 
+// chat schema
 
 export const CREATE_BOT_SCHEMA = Joi.object({
   name: Joi.string().required(),
@@ -124,6 +125,8 @@ export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
 });
 
+
+// end chat schema
 export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
   userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   date: Joi.date().timestamp('javascript').default(Date.now),

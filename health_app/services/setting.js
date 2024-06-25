@@ -6,7 +6,7 @@ const API_BASE_URL = Constants.manifest?.extra?.apiBaseUrl || 'https://climbing-
 // Create an instance of axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 180000,
 });
 
 apiClient.interceptors.request.use(
@@ -31,6 +31,7 @@ const getToken = async () => {
 
 export const CREATE_CHAT = '/api/chat/message'
 export const GET_CHAT_HISTORY = '/api/chat'
+export const CREATE_BOT_ANSWER = '/api/chat/answer'
 
 
 export default apiClient
