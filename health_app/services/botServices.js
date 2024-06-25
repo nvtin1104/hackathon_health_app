@@ -1,13 +1,4 @@
-import axios from 'axios';
-import Constants from 'expo-constants';
-// Base URL for the API
-const API_BASE_URL = Constants.manifest?.extra?.apiBaseUrl || 'http://localhost:9000';
-
-// Create an instance of axios
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
+import apiClient from './setting'
 
 // Service to create a new bot
 export const createBot = async (name, icon, prompt) => {

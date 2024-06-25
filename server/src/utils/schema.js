@@ -89,3 +89,18 @@ export const CREATE_BOT_SCHEMA = Joi.object({
   icon: Joi.string().required(),
   prompt: Joi.string().required(),
 })
+
+export const CREATE_MESSAGE_SCHEMA = Joi.object({
+  userId: Joi.string().required(),
+  botId: Joi.string().required(),
+  message: Joi.string().required(),
+  isBot: Joi.boolean().default(false),
+  type: Joi.string().optional().default('text'),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+})
+
+export const UPDATE_MESSAGE_SCHEMA = Joi.object({
+  message: Joi.string().required(),
+  updatedAt: Joi.date().timestamp('javascript').default(Date.now),
+})

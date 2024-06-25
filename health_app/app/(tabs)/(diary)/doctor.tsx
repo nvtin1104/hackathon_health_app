@@ -3,11 +3,11 @@ import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Platform} f
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { ExpoRouter } from 'expo-router/types/expo-router';
-import { createBot, updateBot, getBotById, getAllBots } from '@/services/apiServices';
+import { getAllBots } from '@/services/botServices';
 export default function DoctorScreen() {
     const [bots, setBots] = useState([]);
     const [error, setError] = useState('');
-
+    const [selectedBot, setSelectedBot] = useState(null);
     useEffect(() => {
         // Fetch all bots when the component mounts
         const fetchBots = async () => {
@@ -26,17 +26,19 @@ export default function DoctorScreen() {
 		router.push(location);
 	};
 
-    console.log(bots)
+    console.log(selectedBot)
 
     return (
             <ScrollView style={styles.container}>
                 <View style={styles.card}>
                     <View style={styles.textContainer}>
                         <Text style={styles.questionText}>Do you have any question for a doctor?</Text>
-                        <TouchableOpacity style={styles.button} onPress={()=>handleNavigate('chat')}>
+                        {selectedBot &&
+                        <TouchableOpacity style={styles.button} onPress={()=>handleNavigate(`chat?botId=${selectedBot?._id}`)}>
                             <MaterialCommunityIcons name="message-text-outline" color="black" style={styles.icon} />
                             <Text style={styles.buttonText}>Ask Question</Text>
                         </TouchableOpacity>
+}
                     </View>
                     <Image
                         resizeMode="cover"
@@ -54,10 +56,12 @@ export default function DoctorScreen() {
                 </View>
                 <ScrollView horizontal style={styles.specialityList}>
                     {bots && bots.length >0 && bots.map((bot, index) => (
-                        <View key={index} style={styles.specialityItem}>
-                            <Image source={{uri: bot.icon}} style={styles.specialityImage}/>
-                            <Text style={styles.specialityText}>{bot.name}</Text>
-                        </View>
+                         <TouchableOpacity  key={index} onPress={()=>setSelectedBot(bot)}>
+                            <View style={styles.specialityItem}>
+                                <Image source={{uri: bot.icon}} style={styles.specialityImage}/>
+                                <Text style={styles.specialityText}>{bot.name}</Text>
+                            </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
                 <View style={styles.historyContainer}>

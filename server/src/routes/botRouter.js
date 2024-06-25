@@ -4,7 +4,7 @@ import { botController } from '~/controllers/botController';
 import verifyToken from '~/middlewares';
 
 const Router = express.Router();
-// tạo bot chat vidu gpt gemini
+// tạo bot chat vi du gpt gemini
 
 Router.post('/', (req, res) => botController.post(req, res));
 Router.put('/:id', (req, res) => botController.update(req, res));

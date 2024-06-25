@@ -1,9 +1,16 @@
-import botModel from '~/models/botModel';
+import chatModel from '~/models/chatModel';
 import { StatusCodes } from 'http-status-codes';
 
 const get = async (req, res) => {
   try {
-    const data = await botModel.getAll();
+    const { botId } = req.params
+    const { _id } = req.user;
+    
+    const conditions = {
+      userId: _id,
+      botId: botId
+    }
+    const data = await chatModel.getAll(conditions);
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
     return res
@@ -15,7 +22,7 @@ const get = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { userId } = req.userId;
-    const data = await botModel.getAllByUserId(userId);
+    const data = await chatModel.getAllByUserId(userId);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -29,9 +36,10 @@ const getById = async (req, res) => {
 const post = async (req, res) => {
   try {
     const body =  req.body;
-    const data = await botModel.create(body);
+    const { _id } = req.user;
+    const data = await chatModel.create({...body, userId: _id});
 
-    return res.status(StatusCodes.OK).json({ success: true, data });
+    return res.status(StatusCodes.OK).json({ success: true, message: 'tạo chat thành công', data });
   } catch (error) {
     return res
       .status(StatusCodes.BAD_REQUEST)
@@ -42,7 +50,7 @@ const post = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await botModel.update(id, req.body);
+    const data = await chatModel.update(id, req.body);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -55,7 +63,7 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await botModel.remove(id);
+    const data = await chatModel.remove(id);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -65,7 +73,7 @@ const remove = async (req, res) => {
   }
 };
 
-export const botController = {
+export const chatController = {
   get,
   post,
   update,

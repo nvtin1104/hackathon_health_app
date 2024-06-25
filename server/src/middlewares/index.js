@@ -8,6 +8,7 @@ const verifyToken = async (req, res, next) => {
   }
   try {
     req.user = jwtDecode(token);
+    console.log(req.user);
     next();
   } catch (error) {
     return res.status(401).send({ message: 'Unauthenticated' });
