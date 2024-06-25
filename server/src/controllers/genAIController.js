@@ -15,18 +15,18 @@ const genGPTAIOverview = async (req, res) => {
 
     switch (gender) {
 
-    case 1:
-      genderText = 'man';
-      break;
-    case 2:
-      genderText = 'woman';
-      break;
-    case 3:
-      genderText = 'other';
-      break;
-    default:
-      genderText = 'unknown';
-      break;
+      case 1:
+        genderText = 'man';
+        break;
+      case 2:
+        genderText = 'woman';
+        break;
+      case 3:
+        genderText = 'other';
+        break;
+      default:
+        genderText = 'unknown';
+        break;
     }
 
     const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day. You are a healthcare professional.${goal ? `. My goal is ${goal}` : ''}. Please give me a report and training plan. 
@@ -63,7 +63,7 @@ const genGPTAIOverview = async (req, res) => {
 
     const data = JSON.parse(messageContent);
 
-    await userModal.updateById(req.user._id, { ...data, updatedAt:  Date.now() });
+    await userModal.updateById(req.user._id, { ...data, updatedAt: Date.now() });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -81,18 +81,18 @@ const genGPTAIMealPlan = async (req, res) => {
 
     switch (gender) {
 
-    case 1:
-      genderText = 'man';
-      break;
-    case 2:
-      genderText = 'woman';
-      break;
-    case 3:
-      genderText = 'other';
-      break;
-    default:
-      genderText = 'unknown';
-      break;
+      case 1:
+        genderText = 'man';
+        break;
+      case 2:
+        genderText = 'woman';
+        break;
+      case 3:
+        genderText = 'other';
+        break;
+      default:
+        genderText = 'unknown';
+        break;
     }
 
     const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day. You are a healthcare professional${goal ? `. My goal is ${goal}` : ''}. Please give me meal plan. Don't give dish. 
@@ -169,28 +169,35 @@ const genGPTAIWorkoutPlan = async (req, res) => {
     const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water } = user;
+    const { goal, time, freetime } = req.body;
 
     let genderText;
 
     switch (gender) {
 
-    case 1:
-      genderText = 'man';
-      break;
-    case 2:
-      genderText = 'woman';
-      break;
-    case 3:
-      genderText = 'other';
-      break;
-    default:
-      genderText = 'unknown';
-      break;
+      case 1:
+        genderText = 'man';
+        break;
+      case 2:
+        genderText = 'woman';
+        break;
+      case 3:
+        genderText = 'other';
+        break;
+      default:
+        genderText = 'unknown';
+        break;
     }
 
-    const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day. You are a healthcare professional. Please give me training plan. 
+    const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day.
+    My goal is ${goal}. I have ${freetime} minutes to practice. And i start at ${time}.
+    You are a healthcare professional. Please give me training plan. 
     Returns a json string remove \`\`\`json at the beginning,  \`\`\` at the end and \n as
     {
+      tilte: vietnamese string,
+      description: vietnamese string,
+      goal: vietnamese string,
+      note: vietnamese string,
       exercises: [
         {
           name: vietnamese string,
@@ -224,7 +231,13 @@ const genGPTAIWorkoutPlan = async (req, res) => {
 
     const messageContent = response.data.choices[0].message.content;
     const data = JSON.parse(messageContent);
-    const result = await workoutPlanModel.updateByUserId(req.user._id, { exercises: data.exercises, updatedAt: Date.now() });
+    const result = await workoutPlanModel.updateByUserId(req.user._id, {
+      title: data.title,
+      description: data.description,
+      note: data.note,
+      exercises: data.exercises,
+      updatedAt: Date.now()
+    });
 
     return res.status(StatusCodes.OK).json({ success: true, data: result });
   } catch (error) {
