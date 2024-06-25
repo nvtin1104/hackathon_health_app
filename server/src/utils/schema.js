@@ -123,3 +123,12 @@ export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
 });
+
+export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  date: Joi.date().timestamp('javascript').default(Date.now),
+  meals: Joi.object().default({}),
+  exercises: Joi.array().default([]),
+  waters: Joi.array().default([]),
+  sleep: Joi.object().default({}),
+})
