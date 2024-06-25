@@ -23,10 +23,13 @@ export const SAVE_USER_SCHEMA = Joi.object({
   nutrition: Joi.string().default(null),
 
   exercise: Joi.number().default(null),
-  heathRate: Joi.number().default(null),
+  healthRate: Joi.number().default(null),
   sleep: Joi.number().default(null),
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
+
+  goal: Joi.string().default(null),
+  pathological: Joi.string().default(null),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -48,6 +51,9 @@ export const UPDATE_USER = Joi.object({
   sleep: Joi.number().default(null),
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
+
+  goal: Joi.string().default(null),
+  pathological: Joi.string().default(null),
 });
 
 export const CREATE_WORKOUT_PLAN_SCHEMA = Joi.object({
@@ -104,3 +110,16 @@ export const UPDATE_MESSAGE_SCHEMA = Joi.object({
   message: Joi.string().required(),
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 })
+export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
+  userId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
+  meals: Joi.object({
+    breakfast: Joi.string().default(null),
+    lunch: Joi.string().default(null),
+    dinner: Joi.string().default(null),
+  }),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+});

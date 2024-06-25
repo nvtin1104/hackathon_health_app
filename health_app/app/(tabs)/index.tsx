@@ -13,11 +13,11 @@ import { ExpoRouter } from 'expo-router/types/expo-router';
 
 export default function HomeScreen() {
 	const handleMeasureNowPress = () => {
-		Alert.alert('Measure Now', 'You clicked Measure Now!');
+		Alert.alert('Đo Ngay', 'Bạn đã nhấn Đo Ngay!');
 	};
 
 	const handleHistoryPress = () => {
-		Alert.alert('History', 'You clicked History!');
+		Alert.alert('Lịch Sử', 'Bạn đã nhấn Lịch Sử!');
 	};
 
 	const handleNavigate = (location: ExpoRouter.Href) => {
@@ -27,7 +27,7 @@ export default function HomeScreen() {
 	return (
 		<ScrollView style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.headerText}>Home</Text>
+				<Text style={styles.headerText}>Trang chủ</Text>
 				<View style={styles.weather}>
 					<Text style={styles.weatherText}>26°C</Text>
 				</View>
@@ -45,18 +45,18 @@ export default function HomeScreen() {
 						style={styles.measureButton}
 						onPress={handleMeasureNowPress}
 					>
-						<Text style={styles.measureButtonText}>Measure Now →</Text>
+						<Text style={styles.measureButtonText}>Đo ngay →</Text>
 					</TouchableOpacity>
 				</View>
 				<View style={styles.footer}>
-					<Text style={styles.lastReportText}>Last Report: Jun 17, 2024</Text>
+					<Text style={styles.lastReportText}>Báo cáo cuối cùng: 17 Tháng 6, 2024</Text>
 					<TouchableOpacity onPress={handleHistoryPress}>
-						<Text style={styles.historyText}>History</Text>
+						<Text style={styles.historyText}>Lịch sử</Text>
 					</TouchableOpacity>
 				</View>
 			</View>
 
-			<Text style={styles.sectionTitle}>Health Diary</Text>
+			<Text style={styles.sectionTitle}>Nhật ký sức khỏe</Text>
 
 			<View style={styles.grid}>
 				<View style={styles.gridItem}>
@@ -67,7 +67,7 @@ export default function HomeScreen() {
 							}}
 							style={styles.gridImage}
 						/>
-						<Text style={styles.gridTitle}>Step Counter</Text>
+						<Text style={styles.gridTitle}>Đếm bước</Text>
 						<Text style={styles.gridValue}>0/6000</Text>
 					</TouchableOpacity>
 				</View>
@@ -79,7 +79,7 @@ export default function HomeScreen() {
 							}}
 							style={styles.gridImage}
 						/>
-						<Text style={styles.gridTitle}>Weight & BMI</Text>
+						<Text style={styles.gridTitle}>Cân nặng & BMI</Text>
 						<Text style={styles.gridValue}>-- KG</Text>
 					</TouchableOpacity>
 				</View>
@@ -91,7 +91,7 @@ export default function HomeScreen() {
 							}}
 							style={styles.gridImage}
 						/>
-						<Text style={styles.gridTitle}>Water Reminder</Text>
+						<Text style={styles.gridTitle}>Nhắc nhở uống nước</Text>
 						<Text style={styles.gridValue}>200/2000 ml</Text>
 					</TouchableOpacity>
 				</View>
@@ -104,8 +104,8 @@ export default function HomeScreen() {
 							}}
 							style={styles.gridImage}
 						/>
-						<Text style={styles.gridTitle}>AI Doctor</Text>
-						<Text style={styles.gridValue}>Ask any doctor</Text>
+						<Text style={styles.gridTitle}>Bác sĩ AI</Text>
+						<Text style={styles.gridValue}>Hỏi bất kỳ bác sĩ nào</Text>
 					</TouchableOpacity>
 				</View>
 			</View>

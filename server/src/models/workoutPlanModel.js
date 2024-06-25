@@ -3,51 +3,94 @@ import { ObjectId } from 'mongodb';
 import { CREATE_WORKOUT_PLAN_SCHEMA, UPDATE_WORKOUT_PLAN } from '~/utils/schema';
 
 const validateBeforeCreate = async (data) => {
-  return await CREATE_WORKOUT_PLAN_SCHEMA.validateAsync(data, { abortEarly: false });
-}
+  try {
+    return await CREATE_WORKOUT_PLAN_SCHEMA.validateAsync(data, { abortEarly: false });
+  } catch (error) {
+    throw new Error(`Validation Error: ${error.message}`);
+  }
+};
 
 const validateBeforeUpdate = async (data) => {
-  return await UPDATE_WORKOUT_PLAN.validateAsync(data, { abortEarly: false });
-}
+  try {
+    return await UPDATE_WORKOUT_PLAN.validateAsync(data, { abortEarly: false });
+  } catch (error) {
+    throw new Error(`Validation Error: ${error.message}`);
+  }
+};
 
-const getAll = async() => {
-  const collection = await GET_DB().collection('workoutPlans');
-
-  return await collection.find({}).toArray();
+const getAll = async () => {
+  try {
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.find({}).toArray();
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
 };
 
 const getAllByUserId = async (userId) => {
-  const collection = await GET_DB().collection('workoutPlans');
-
-  return await collection.find({ userId: userId }).toArray();
-}
+  try {
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.find({ userId: new ObjectId(userId) }).toArray();
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
+};
 
 const findOne = async (id) => {
-  const collection = await GET_DB().collection('workoutPlans');
-
-  return await collection.findOne({ _id: new ObjectId(id) });
-}
+  try {
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.findOne({ _id: new ObjectId(id) });
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
+};
 
 const create = async (data) => {
-  console.log(data)
-  const validData = await validateBeforeCreate(data);
-  const collection = await GET_DB().collection('workoutPlans');
-
-  return await collection.insertOne(validData);
-}
+  try {
+    if (data.userId) {
+      data.userId = new ObjectId(data.userId);
+    }
+    const validData = await validateBeforeCreate(data);
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.insertOne(validData);
+  } catch (error) {
+    throw new Error(`Create Error: ${error.message}`);
+  }
+};
 
 const update = async (id, data) => {
-  const validData = await validateBeforeUpdate(data);
-  const collection = await GET_DB().collection('workoutPlans');
+  try {
+    const validData = await validateBeforeUpdate(data);
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.updateOne({ _id: new ObjectId(id) }, { $set: validData });
+  } catch (error) {
+    throw new Error(`Update Error: ${error.message}`);
+  }
+};
 
-  return await collection.updateOne({ _id: new ObjectId(id) }, { $set: validData });
-}
+const updateByUserId = async (userId, data) => {
+  try {
+    const result = await GET_DB()
+      .collection('workoutPlans')
+      .findOneAndUpdate(
+        { userId: new ObjectId(userId) },
+        { $set: data },
+        { returnDocument: 'after' }
+      );
+    return result;
+  } catch (error) {
+    throw new Error(`Update Error: ${error.message}`);
+  }
+};
 
 const remove = async (id) => {
-  const collection = await GET_DB().collection('workoutPlans');
-
-  return await collection.deleteOne({ _id: new ObjectId(id) });
-}
+  try {
+    const collection = await GET_DB().collection('workoutPlans');
+    return await collection.deleteOne({ _id: new ObjectId(id) });
+  } catch (error) {
+    throw new Error(`Delete Error: ${error.message}`);
+  }
+};
 
 export default {
   getAll,
@@ -55,5 +98,6 @@ export default {
   findOne,
   create,
   update,
+  updateByUserId,
   remove
-}
+};

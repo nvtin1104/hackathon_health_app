@@ -1,5 +1,16 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {View, Text, TouchableOpacity, Image, StyleSheet, Platform, SafeAreaView, Modal, TextInput} from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    Image,
+    StyleSheet,
+    Platform,
+    SafeAreaView,
+    Modal,
+    TextInput,
+    ScrollView
+} from 'react-native';
 import React, {useState} from 'react';
 import {ThemedView} from '@/components/ThemedView';
 
@@ -9,49 +20,70 @@ export default function WaterReminderScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
+    const handleInputChangeAndValidate = (text) => {
+        setInputValue(text);
+        validateInput(text);
+    }
+
+    const validateInput = (text) => {
+        const value = Number(text);
+        if (isNaN(value)) {
+            console.log("Input is not a number");
+            return false;
+        }
+        if (value < 500 || value > 10000) {
+            console.log("Input is out of range (500-10000)");
+            return false;
+        }
+        console.log("Input is valid");
+        return true;
+    }
     return (
         <>
-            <ThemedView style={styles.container}>
-                <View style={styles.container}>
-                    <Text style={styles.waterAmount}>0ml</Text>
-                    <View style={styles.infoBox}>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Daily Goal:</Text>
-                            <TouchableOpacity onPress={() => setModalVisible(true)}>
-                                <Text style={styles.infoValue}>2000ml
-                                    <Image
-                                        source={{uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg'}}
-                                        style={styles.editIcon}/>
-                                </Text>
+            <ScrollView contentContainerStyle={styles.container} >
+                <Text style={styles.waterAmount}>0 lít</Text>
+                        <View style={styles.infoBox}>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Mục tiêu hàng ngày:</Text>
+                                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                                    <Text style={styles.infoValue}>2 lít
+                                        <Image
+                                            source={{uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg'}}
+                                            style={styles.editIcon}/>
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Lần uống cuối:</Text>
+                                <Text style={styles.infoValue}>--l</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoText}>Số lượng:</Text>
+                                <Text style={styles.infoValue}>0 Cốc</Text>
+                            </View>
+                            <TouchableOpacity style={styles.historyButton}>
+                                <Text style={styles.historyText}>Lịch sử và thống kê</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Last Drink:</Text>
-                            <Text style={styles.infoValue}>--ml</Text>
-                        </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.infoText}>Number:</Text>
-                            <Text style={styles.infoValue}>0 Cup</Text>
-                        </View>
-                        <TouchableOpacity style={styles.historyButton}>
-                            <Text style={styles.historyText}>History and Statistics</Text>
+                        <TouchableOpacity style={styles.recordButton}>
+                            <Text style={styles.recordText}>Nhấn vào đây để ghi lại lần uống đầu tiên hôm nay!</Text>
                         </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity style={styles.recordButton}>
-                        <Text style={styles.recordText}>Tap Here to record your first drink today!</Text>
-                    </TouchableOpacity>
-                    <View style={styles.footer}>
-                        <TouchableOpacity style={styles.minusButton}>
-                            <Text style={styles.minusText}>-</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.addButton}>
+                        <View style={styles.footer}>
+                            <TouchableOpacity style={styles.minusButton}>
+                                <Text style={styles.minusText}>-</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.addButton}>
 
-                            <Image source={require('../../../assets/images/plusglass.png')} style={styles.addIcon}/>
-                        </TouchableOpacity>
-                        <Text style={styles.footerText}>200ml</Text>
-                    </View>
-                </View>
-            </ThemedView>
+                                <Image source={require('../../../assets/images/plusglass.png')} style={styles.addIcon}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.plusButton}>
+                                <Image source={{uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUrIYhKJ-HYV8DYjUYD7UFKFGBAAJo4QlwT0fDBKLPHA1Nxwxh"}}
+                                       style={styles.addIcon}/>
+                                <Text style={styles.footerText}>200ml</Text>
+                            </TouchableOpacity>
+                        </View>
+
+            </ScrollView>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -64,15 +96,16 @@ export default function WaterReminderScreen() {
                     <View style={styles.modalContainer}>
                         <TextInput
                             style={styles.input}
-                            onChangeText={text => setInputValue(text)}
+                            onChangeText={handleInputChangeAndValidate}
                             value={inputValue}
+                            placeholder={"500-10000"}
                         />
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <Text >Hủy</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{
@@ -80,11 +113,14 @@ export default function WaterReminderScreen() {
                                     backgroundColor: inputValue === '' ? '#ccc' : '#4CAF50',
                                 }}
                                 onPress={() => {
-                                    // Handle OK button press
-                                    setModalVisible(!modalVisible);
+                                    // Validate the input when the button is pressed
+                                    if (validateInput(inputValue)) {
+                                        // If the input is valid, close the modal
+                                        setModalVisible(!modalVisible);
+                                    }
                                 }}
                             >
-                                <Text style={styles.buttonText}>OK</Text>
+                                <Text >Đồng ý</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -92,8 +128,6 @@ export default function WaterReminderScreen() {
                 </View>
             </Modal>
         </>
-
-
     );
 }
 
@@ -103,7 +137,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         width: '100%',
-    height: '100%',
+        height: '100%',
     },
     header: {
         flexDirection: 'row',
@@ -176,8 +210,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     addIcon: {
-        width: 100,
-        height: 100,
+        width: 50,
+        height: 50,
     },
     footerText: {
         fontSize: 18,
@@ -185,6 +219,13 @@ const styles = StyleSheet.create({
     editIcon: {
         width: 20,
         height: 20,
+    },
+    plusButton: {
+        backgroundColor: '#fff',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 15,
+        borderRadius: 50,
     },
     modalView: {
         margin: 20,
