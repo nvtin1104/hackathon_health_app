@@ -1,5 +1,6 @@
 import workoutPlanModel from '~/models/workoutPlanModel';
 import { StatusCodes } from 'http-status-codes';
+import { dailyActApi } from './../routes/dailyActRouter';
 
 const getAll = async (req, res) => {
   try {
@@ -14,8 +15,8 @@ const getAll = async (req, res) => {
 
 const getAllByUserId = async (req, res) => {
   try {
-    const { userId } = req.user._id;
-    const data = await workoutPlanModel.getAllByUserId(userId);
+    const { _id } = req.user;
+    const data = await workoutPlanModel.getAllByUserId(_id);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {

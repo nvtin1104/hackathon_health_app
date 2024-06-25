@@ -1,6 +1,10 @@
+import { useSession } from '@/auth/ctx';
 import { ThemedView } from '@/components/ThemedView';
+import FullLoading from '@/components/loading/FullLoading';
+import { colorTheme } from '@/utils/colors';
+import { showToast } from '@/utils/toast';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
 	StyleSheet,
@@ -11,70 +15,193 @@ import {
 	TouchableOpacity,
 	FlatList,
 	VirtualizedList,
+	TextInput,
+	ScrollView,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-type ItemData = {
-	id: string;
-	title: string;
+type Errors = {
+	goal?: string;
+	freetime?: string;
+	time?: string;
 };
-type ItemDataList = {
-	id: string;
-	title: string;
-	uri: string;
-};
-const DATA: ItemData[] = [
-	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-		title: 'Hoàn thành',
-	},
-	{
-		id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-		title: 'Chưa hoàn thành',
-	},
-];
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 export default function CreateExerciseScreen() {
-	const [selectedId, setSelectedId] = useState<string>();
-	const handlePress = () => {
-		router.push('detail-exercise/1');
+	const { session } = useSession();
+	const [loading, setLoading] = useState(false);
+	const data = session ? JSON.parse(session) : null;
+	const router = useRouter();
+	const [goal, onChangeGoal] = useState('');
+	const [time, onChangeTime] = useState('');
+	const [freetime, onChangeFreetime] = useState('');
+	const createExercise = () => {
+		setLoading(true);
+		fetch(`${apiUrl}/ai/workoutPlan`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + data.token,
+			},
+			body: JSON.stringify({
+				goal: goal,
+				freetime: freetime,
+				time: time,
+			}),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text(); // Get the raw response text
+			})
+			.then((text) => {
+				try {
+					const data = JSON.parse(text);
+					if (data.error) {
+						Alert.alert('Error', data.error);
+					} else {
+						if (data.success == true) {
+							setLoading(false);
+							showToast('Tạo bài tập thành công');
+							setTimeout(() => {
+								router.push('/exercise', { refresh: true });
+							}, 1000);
+						} else {
+							showToast('Có lỗi xảy ra, vui lòng thử lại sau');
+						}
+					}
+				} catch (error) {
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+			});
+	};
+	// validation.js
+	const validateFields = (goal: any, freetime: any, time: any) => {
+		const errors: Errors = {};
+
+		if (!goal) {
+			errors.goal = 'Mục tiêu không được để trống';
+		}
+
+		if (!freetime) {
+			errors.freetime = 'Thời gian rảnh không được để trống';
+		}
+		if (0 > time || time >= 24) {
+			errors.time = 'Thời gian tập luyện không hợp lệ';
+		}
+		if (!time) {
+			errors.time = 'Thời gian tập luyện không được để trống';
+		} else if (isNaN(time)) {
+			errors.time = 'Thời gian tập luyện phải là số';
+		}
+
+		return errors;
+	};
+	const handleSubmit = () => {
+		const validationErrors = validateFields(goal, freetime, time);
+		if (Object.keys(validationErrors).length > 0) {
+			const firstError = Object.values(validationErrors)[0];
+			showToast(firstError);
+		} else {
+			Alert.alert(
+				'Tạo bài tập',
+				'Việc tạo bài tập mới sẽ xóa toàn bộ bài tập có và tiến trình. Bạn có chắc không?',
+				[
+					{
+						text: 'Hủy',
+						style: 'cancel',
+					},
+					{
+						text: 'Có',
+						onPress: () => createExercise(),
+					},
+				]
+			);
+		}
 	};
 
-	return <ThemedView style={styles.container}></ThemedView>;
+	return (
+		<ScrollView style={styles.container}>
+			{loading ? (
+				<FullLoading />
+			) : (
+				<View>
+					<View style={styles.inputContainer}>
+						<Text style={styles.label}>Mục tiêu:</Text>
+						<TextInput
+							style={styles.input}
+							onChangeText={onChangeGoal}
+							placeholder="Mục tiêu"
+							value={goal}
+						/>
+					</View>
+					<View style={styles.inputContainer}>
+						<Text style={styles.label}>Thời gian rảnh (Phút):</Text>
+						<TextInput
+							style={styles.input}
+							onChangeText={onChangeFreetime}
+							placeholder="Thời gian rảnh"
+							value={freetime}
+						/>
+					</View>
+					<View style={styles.inputContainer}>
+						<Text style={styles.label}>Bắt đầu tập luyện lúc(Giờ):</Text>
+						<TextInput
+							style={styles.input}
+							onChangeText={onChangeTime}
+							placeholder="Thời gian tập luyện"
+							value={time}
+						/>
+					</View>
+					<TouchableOpacity style={styles.button} onPress={handleSubmit}>
+						<Text style={styles.buttonText}>Tạo</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 12,
-	},
-	content: {
-		backgroundColor: '#F5F5F5',
-	},
-	item: {
-		padding: 8,
-		borderRadius: 8,
-		marginVertical: 4,
-		marginHorizontal: 8,
+		backgroundColor: 'white',
 	},
 	title: {
-		fontSize: 12,
+		fontSize: 24,
+		fontWeight: 'bold',
 	},
-	itemExercise: {
-		backgroundColor: '#C8E6C9',
-		marginVertical: 8,
-		marginHorizontal: 16,
-		padding: 12,
-		borderRadius: 12,
+	label: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginVertical: 12,
+	},
+	inputContainer: {
 		display: 'flex',
-		flexDirection: 'row',
+		flexDirection: 'column',
 	},
-	itemExerciseImg: {
-		width: 80,
-		height: 80,
-		borderRadius: 8,
+	input: {
+		marginHorizontal: 12,
+		paddingVertical: 12,
+		paddingHorizontal: 24,
+		borderRadius: 32,
+		marginBottom: 12,
+		borderColor: '#ccc',
+		borderWidth: 1,
 	},
-	itemExerciseText: {
-		marginLeft: 12,
+	button: {
+		backgroundColor: colorTheme.background.primary,
+		padding: 12,
+		borderRadius: 24,
+		alignItems: 'center',
+		margin: 12,
+	},
+	buttonText: {
+		color: 'white',
 		fontSize: 16,
 	},
 });
