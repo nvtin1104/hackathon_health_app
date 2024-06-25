@@ -20,6 +20,10 @@ export default function SettingLayout() {
 			<Stack.Screen name="main" options={{ headerTitle: 'Cá nhân' }} />
 			<Stack.Screen name="parameter" options={{ headerTitle: 'Thông số' }} />
 			<Stack.Screen name="profile" options={{ headerTitle: 'Hồ sơ' }} />
+			<Stack.Screen
+				name="tas"
+				options={{ headerTitle: 'Điều khoản và dịch vụ' }}
+			/>
 		</Stack>
 	);
 }
