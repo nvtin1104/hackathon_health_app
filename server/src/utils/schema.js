@@ -82,3 +82,10 @@ export const UPDATE_WORKOUT_PLAN = Joi.object({
   ),
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 });
+
+
+export const CREATE_BOT_SCHEMA = Joi.object({
+  name: Joi.string().required(),
+  icon: Joi.string().required(),
+  prompt: Joi.string().required(),
+})

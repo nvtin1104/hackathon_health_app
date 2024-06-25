@@ -1,13 +1,39 @@
+import React, { useState, useEffect } from 'react';
 import {StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Platform} from 'react-native';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Link, router } from 'expo-router';
+import { ExpoRouter } from 'expo-router/types/expo-router';
+import { createBot, updateBot, getBotById, getAllBots } from '@/services/apiServices';
 export default function DoctorScreen() {
+    const [bots, setBots] = useState([]);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        // Fetch all bots when the component mounts
+        const fetchBots = async () => {
+          try {
+            const botsData = await getAllBots();
+            setBots(botsData.data);
+          } catch (err: any) {
+            setError(err.message);
+          }
+        };
+    
+        fetchBots();
+      }, []);
+
+    const handleNavigate = (location: ExpoRouter.Href) => {
+		router.push(location);
+	};
+
+    console.log(bots)
+
     return (
             <ScrollView style={styles.container}>
                 <View style={styles.card}>
                     <View style={styles.textContainer}>
                         <Text style={styles.questionText}>Do you have any question for a doctor?</Text>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={()=>handleNavigate('chat')}>
                             <MaterialCommunityIcons name="message-text-outline" color="black" style={styles.icon} />
                             <Text style={styles.buttonText}>Ask Question</Text>
                         </TouchableOpacity>
@@ -27,10 +53,10 @@ export default function DoctorScreen() {
                     </TouchableOpacity>
                 </View>
                 <ScrollView horizontal style={styles.specialityList}>
-                    {['Cardiologists', 'Hematologists', 'Endocrinologists', 'Internists'].map((speciality, index) => (
+                    {bots && bots.length >0 && bots.map((bot, index) => (
                         <View key={index} style={styles.specialityItem}>
-                            <Image source={{uri: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcToYUSvmTkRAvP7ZJ3eT9f4FaiJIgJnTqAwuaB2PZrIPLA4iawC'}} style={styles.specialityImage}/>
-                            <Text style={styles.specialityText}>{speciality}</Text>
+                            <Image source={{uri: bot.icon}} style={styles.specialityImage}/>
+                            <Text style={styles.specialityText}>{bot.name}</Text>
                         </View>
                     ))}
                 </ScrollView>
