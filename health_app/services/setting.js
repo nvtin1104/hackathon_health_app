@@ -1,5 +1,5 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 // Base URL for the API
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://climbing-grouper-mildly.ngrok-free.app';
@@ -24,7 +24,7 @@ apiClient.interceptors.request.use(
 
 const getToken = async () => {
   try {
-    const token = await AsyncStorage.getItem('token');
+    const token = await SecureStore.getItemAsync('token');
     return token !== null ? token : null;
   } catch (error) {
     console.error('Failed to fetch the token from AsyncStorage', error);
