@@ -29,7 +29,8 @@ export default function SignIn() {
     if (!check) {
       return;
     }
-    fetch(`${apiUrl}/users`, {
+    console.log("${apiUrl}/users/login",`${apiUrl}/users/login`)
+    fetch(`${apiUrl}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,22 +48,23 @@ export default function SignIn() {
       })
       .then((text) => {
         try {
-          const data = JSON.parse(text); // Attempt to parse the response as JSON
+          console.log(text);
+          const data = JSON.parse(text);
+
           if (data.error) {
             Alert.alert('Error', data.error);
           } else {
-            console.log(data);
-
             if (data.success == true) {
-              router.replace('/');
+              AsyncStorage.setItem('token', data.userData.token);
               //   showToast(data.message);
               signIn(data.userData);
-              //   router.replace('/');
+                router.replace('/');
             } else {
               showToast(data.message);
             }
           }
         } catch (error) {
+          console.log(error);
           Alert.alert('Error', 'Failed to parse server response');
         }
       })

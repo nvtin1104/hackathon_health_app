@@ -17,7 +17,7 @@ Router.use('/users', usersApi);
 
 // Workout Plan
 Router.use('/wp', verifyToken, workoutPlanApi);
-Router.use('/bot', botRouter);
+Router.use('/bot', verifyToken, botRouter);
 Router.use('/chat',verifyToken, chatRouter);
 
 // Meal Plan
