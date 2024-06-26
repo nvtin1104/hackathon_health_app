@@ -5,14 +5,10 @@ import {
   View,
   TouchableOpacity,
   Text,
-  Button,
   Alert,
-  ToastAndroid,
-  Image,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
-import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
 import { showToast } from '@/utils/toast';

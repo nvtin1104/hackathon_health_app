@@ -1,7 +1,6 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
 // Base URL for the API
-const API_BASE_URL = Constants.manifest?.extra?.apiBaseUrl || 'https://climbing-grouper-mildly.ngrok-free.app';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://climbing-grouper-mildly.ngrok-free.app';
 
 // Create an instance of axios
 const apiClient = axios.create({
