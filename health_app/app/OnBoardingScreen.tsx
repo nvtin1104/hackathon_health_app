@@ -3,6 +3,8 @@ import { TouchableOpacity } from 'react-native';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colorTheme } from '@/utils/colors';
+
 interface OnBoardingScreenProps {
   setisFirst: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -53,8 +55,9 @@ const OnBoardingScreen: React.FC<OnBoardingScreenProps> = ({ setisFirst }) => {
         onDone={handleSkip}
         DoneButtonComponent={DoneButtonComponent}
         bottomBarHeight={60}
+        // bottomBarColor={colorTheme.background.secondary}
         pages={data.map((item) => ({
-          backgroundColor: '#fff',
+          backgroundColor: colorTheme.background.secondary,
           image: <Image source={{ uri: item.url }} style={styles.img} />,
           title: item.title,
           subtitle: item.subtitle,
@@ -69,6 +72,7 @@ export default OnBoardingScreen;
 const styles = StyleSheet.create({
   home: {
     height: Dimensions.get('window').height,
+    backgroundColor: colorTheme.white,
   },
   img: {
     width: Dimensions.get('window').width,
