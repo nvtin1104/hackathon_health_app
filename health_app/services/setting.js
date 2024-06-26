@@ -1,7 +1,6 @@
 import axios from 'axios';
 // Base URL for the API
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://climbing-grouper-mildly.ngrok-free.app';
-
 // Create an instance of axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
