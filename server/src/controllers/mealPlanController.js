@@ -1,6 +1,6 @@
 
 import { StatusCodes } from 'http-status-codes';
-import mealPlanModel from '~/models/mealPlanModel';
+import { mealPlanModel } from '~/models/mealPlanModel';
 
 const getAll = async (req, res) => {
   try {
@@ -17,6 +17,18 @@ const getAllByUserId = async (req, res) => {
   try {
     const { userId } = req.user._id;
     const data = await mealPlanModel.getAllByUserId(userId);
+
+    return res.status(StatusCodes.OK).json({ success: true, data });
+  } catch (error) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ success: false, message: error.message });
+  }
+};
+const getByUserId = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const data = await mealPlanModel.getMeal(userId);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -83,12 +95,13 @@ const remove = async (req, res) => {
   }
 };
 
-export const workoutPlanController = {
+export const mealPlanController = {
   getAll,
   getAllByUserId,
   findOne,
   create,
   update,
-  remove
+  remove,
+  getByUserId
 };
 

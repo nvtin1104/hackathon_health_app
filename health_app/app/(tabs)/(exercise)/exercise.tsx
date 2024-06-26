@@ -71,7 +71,7 @@ export default function ExerciseIndexScreen() {
 			.catch((error) => {
 				Alert.alert('Error', error.message);
 			});
-	}, []);
+	}, [session]);
 	return (
 		<ScrollView style={styles.container}>
 			{loading ? (
