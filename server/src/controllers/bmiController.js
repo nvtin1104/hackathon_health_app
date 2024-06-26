@@ -2,17 +2,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { bmiModel } from '~/models/bmiModel';
 import mealPlanModel from '~/models/mealPlanModel';
+import { userModal } from '~/models/userModel';
 
-const getAll = async (req, res) => {
-  try {
-    const data = await mealPlanModel.getAll();
-    return res.status(StatusCodes.OK).json({ success: true, data });
-  } catch (error) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ success: false, message: error.message });
-  }
-};
 
 const getAllByUserId = async (req, res) => {
   try {
@@ -27,18 +18,6 @@ const getAllByUserId = async (req, res) => {
   }
 };
 
-const findOne = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = await mealPlanModel.findOne(id);
-
-    return res.status(StatusCodes.OK).json({ success: true, data });
-  } catch (error) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ success: false, message: error.message });
-  }
-};
 
 const create = async (req, res) => {
   try {
@@ -67,6 +46,7 @@ const create = async (req, res) => {
     // Sử dụng hàm evaluateBMI để đánh giá và làm tròn BMI
     bmi = bmi.toFixed(2);
     const bmiEvaluation = evaluateBMI(bmi);
+    await userModal.update(userId, { height, weight });
     const data = await bmiModel.create({ userId, ...req.body, bmi, bmiEvaluation });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
@@ -77,18 +57,6 @@ const create = async (req, res) => {
   }
 };
 
-const update = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = await mealPlanModel.update(id, req.body);
-
-    return res.status(StatusCodes.OK).json({ success: true, data });
-  } catch (error) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ success: false, message: error.message });
-  }
-};
 const get7Time = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -114,11 +82,8 @@ const remove = async (req, res) => {
 };
 
 export const bmiController = {
-  getAll,
   getAllByUserId,
-  findOne,
   create,
-  update,
   remove,
   get7Time
 };
