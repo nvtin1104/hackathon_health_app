@@ -32,8 +32,7 @@ export const getBotById = async (id) => {
 
 export const getAllBots = async () => {
   try {
-    console.log('Getting all bots')
-    const response = await apiClient.get('/api/bot');
+    const response = await apiClient.get('/bot');
     return response.data;
   } catch (error) {
     console.error("message",error)

@@ -24,7 +24,7 @@ const ChatScreen = () => {
           createdAt: new Date(message.createdAt),
           user: {
             _id: message.isBot ? 2 : 1,
-            name: message.isBot ? 'bot' : 'me',
+            name: message.isBot ?  message.bot.name : message.user.name,
           },
         }));
         setMessages(parsedMessages);

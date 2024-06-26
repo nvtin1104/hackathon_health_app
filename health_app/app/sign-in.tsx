@@ -1,19 +1,18 @@
 import {
-	SafeAreaView,
-	StyleSheet,
-	TextInput,
-	View,
-	TouchableOpacity,
-	Text,
-	Button,
-	Alert,
-	ToastAndroid,
-	Image,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Text,
+  Button,
+  Alert,
+  ToastAndroid,
+  Image,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
-import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
 import { showToast } from '@/utils/toast';
@@ -22,56 +21,57 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { Link } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SignIn() {
-	const { signIn } = useSession();
-	const [password, onChangePassword] = useState('');
-	const [email, onChangeText] = useState('');
-	const [secureTextEntry, setSecureTextEntry] = useState(true);
-	const [firstLogin, setIsFirst] = useState(false);
-	const handleLogin = () => {
-		const check = validateForm();
-		if (!check) {
-			return;
-		}
-		fetch(`${apiUrl}/users/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				email,
-				password,
-			}),
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-				return response.text(); // Get the raw response text
-			})
-			.then((text) => {
-				try {
-					const data = JSON.parse(text); // Attempt to parse the response as JSON
-					if (data.error) {
-						Alert.alert('Error', data.error);
-					} else {
-						console.log(data);
+  const { signIn } = useSession();
+  const [password, onChangePassword] = useState('');
+  const [email, onChangeText] = useState('');
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-						if (data.success == true) {
-							showToast(data.message);
-							signIn(data.userData);
-							router.replace('/');
-						} else {
-							showToast(data.message);
-						}
-					}
-				} catch (error) {
-					Alert.alert('Error', 'Failed to parse server response');
-				}
-			})
-			.catch((error) => {
-				Alert.alert('Error', error.message);
-			});
-	};
+  const handleLogin = () => {
+    const check = validateForm();
+    if (!check) {
+      return;
+    }
+    fetch(`${apiUrl}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text(); // Get the raw response text
+      })
+      .then((text) => {
+        try {
+          const data = JSON.parse(text); // Attempt to parse the response as JSON
+          if (data.error) {
+            Alert.alert('Error', data.error);
+          } else {
+            console.log(data);
+
+            if (data.success == true) {
+              router.replace('/');
+              //   showToast(data.message);
+              signIn(data.userData);
+              //   router.replace('/');
+            } else {
+              showToast(data.message);
+            }
+          }
+        } catch (error) {
+          Alert.alert('Error', 'Failed to parse server response');
+        }
+      })
+      .catch((error) => {
+        Alert.alert('Error', error.message);
+      });
+  };
 
 	type Errors = {
 		email?: string;
