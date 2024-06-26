@@ -19,7 +19,8 @@ import { showToast } from '@/utils/toast';
 import OnBoardingScreen from './OnBoardingScreen';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Entypo from '@expo/vector-icons/Entypo';
+import { Link } from 'expo-router';
 export default function SignIn() {
   const { signIn } = useSession();
   const [password, onChangePassword] = useState('');
@@ -27,7 +28,10 @@ export default function SignIn() {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const handleLogin = () => {
-    console.log(apiUrl);
+    const check = validateForm();
+    if (!check) {
+      return;
+    }
     fetch(`${apiUrl}/users`, {
       method: 'POST',
       headers: {
@@ -75,15 +79,9 @@ export default function SignIn() {
     password?: string;
   };
   const [errors, setErrors] = useState<Errors>({});
-  const [isFormValid, setIsFormValid] = useState(false);
-
-  useEffect(() => {
-    validateForm();
-  }, [email, password]);
 
   const validateForm = () => {
     let errors: Errors = {};
-
     // Validate email field
     if (!email) {
       errors.email = 'Email là bắt buộc.';
@@ -97,9 +95,12 @@ export default function SignIn() {
     } else if (password.length < 3) {
       errors.password = 'Mật khẩu phải có ít nhất 3 ký tự.';
     }
-
-    setErrors(errors);
-    setIsFormValid(Object.keys(errors).length === 0);
+    if (Object.keys(errors).length != 0) {
+      setErrors(errors);
+      return false;
+    }
+    setErrors({});
+    return true;
   };
 
   const [isFirst, setisFirst] = useState(true);
@@ -131,14 +132,41 @@ export default function SignIn() {
             backgroundColor: colorTheme.background.secondary,
           }}
         >
+          <Image
+            style={styles.image}
+            source={{
+              uri: 'https://i.pinimg.com/736x/9f/93/ae/9f93ae8f39417cd575e735bf5f1b1505.jpg',
+            }}
+          />
+          <Text style={{ fontFamily: 'LeagueLight', fontSize: 32, margin: 8 }}>
+            Healthy Care
+          </Text>
+          <Text
+            style={{
+              fontFamily: 'LeagueMedium',
+              marginBottom: 20,
+              fontSize: 16,
+            }}
+          >
+            Voi Tây nguyên
+          </Text>
+
           <SafeAreaView>
+            <Text style={{ fontFamily: 'LeagueLight', fontSize: 16 }}>
+              Tên đăng nhập
+            </Text>
             <TextInput
-              style={styles.input}
+              style={styles.inputDone}
               onChangeText={onChangeText}
-              placeholder="Tên đăng nhập"
+              placeholder="Nhập tên đăng nhập"
               value={email}
             />
             {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            <Text
+              style={{ fontFamily: 'LeagueLight', fontSize: 16, marginTop: 12 }}
+            >
+              Mật khẩu
+            </Text>
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -151,20 +179,32 @@ export default function SignIn() {
                 style={styles.toggleButton}
                 onPress={() => setSecureTextEntry(!secureTextEntry)}
               >
-                <Text>{secureTextEntry ? 'Hiện' : 'Ẩn'}</Text>
+                <Text>
+                  {secureTextEntry ? (
+                    <Entypo name="eye" size={16} color="black" />
+                  ) : (
+                    <Entypo name="eye-with-line" size={16} color="black" />
+                  )}
+                </Text>
               </TouchableOpacity>
             </View>
             {errors.password && (
               <Text style={styles.error}>{errors.password}</Text>
             )}
             <TouchableOpacity
-              style={[styles.button, { opacity: isFormValid ? 1 : 0.5 }]}
-              disabled={!isFormValid}
+              style={[
+                styles.button,
+                { opacity: email == '' || password == '' ? 0.5 : 1 },
+              ]}
+              disabled={email == '' || password == ''}
               onPress={handleLogin}
             >
               <Text style={styles.textButton}>Đăng nhập</Text>
             </TouchableOpacity>
           </SafeAreaView>
+          <Text style={{ fontFamily: 'LeagueLight', marginTop: 20 }}>
+            Chưa có tài khoản? <Link href="/register">Đăng ký ngay</Link>
+          </Text>
         </View>
       )}
     </>
@@ -172,21 +212,26 @@ export default function SignIn() {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    margin: 12,
-    borderWidth: 2,
-    borderRadius: 36,
+  inputDone: {
+    fontFamily: 'LeagueLight',
+    marginTop: 10,
+    fontSize: 16,
+    marginBottom: 10,
+    paddingHorizontal: 12,
     paddingVertical: 12,
+    elevation: 0,
+    borderRadius: 2,
     width: 300,
     borderColor: colorTheme.background.primary,
-    paddingHorizontal: 24,
     backgroundColor: colorTheme.white,
   },
+
   button: {
     backgroundColor: colorTheme.background.primary,
-    padding: 16,
+    padding: 12,
     borderRadius: 36,
-    margin: 12,
+    marginTop: 20,
+    width: 300,
     textAlign: 'center',
     alignItems: 'center',
   },
@@ -196,22 +241,34 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 12,
-    borderWidth: 2,
-    borderRadius: 36,
-    borderColor: colorTheme.background.primary,
+    marginBottom: 12,
+    marginTop: 12,
+    borderRadius: 2,
     backgroundColor: colorTheme.white,
   },
   passwordInput: {
     flex: 1,
+    fontFamily: 'LeagueLight',
+    fontSize: 16,
+    paddingHorizontal: 12,
     paddingVertical: 12,
-    paddingHorizontal: 24,
+    elevation: 0,
+    borderRadius: 2,
+    borderColor: colorTheme.background.primary,
+    backgroundColor: colorTheme.white,
   },
   error: {
     color: colorTheme.lightRed,
-    marginLeft: 12,
+    fontFamily: 'LeagueLight',
+    marginBottom: 10,
+    fontSize: 16,
   },
   toggleButton: {
-    padding: 12,
+    padding: 10,
+  },
+  image: {
+    width: 80,
+    height: 80,
+    objectFit: 'cover',
   },
 });
