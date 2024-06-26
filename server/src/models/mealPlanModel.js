@@ -68,7 +68,7 @@ const updateByUserId = async (userId, data) => {
       .findOneAndUpdate(
         { userId: new ObjectId(userId) },
         { $set: data },
-        { returnDocument: 'after' }
+        { returnDocument: 'after', upsert: true }
       );
     return result;
   } catch (error) {
