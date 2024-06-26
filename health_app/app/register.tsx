@@ -10,17 +10,17 @@ import {
 	ToastAndroid,
 	Image,
 } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { colorTheme } from '@/utils/colors';
+import { request } from '@/utils/request';
 import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
 import { showToast } from '@/utils/toast';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Link } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-export default function SignIn() {
+export default function RegisterScreen() {
 	const { signIn } = useSession();
 	const [password, onChangePassword] = useState('');
 	const [email, onChangeText] = useState('');
@@ -31,7 +31,7 @@ export default function SignIn() {
 		if (!check) {
 			return;
 		}
-		fetch(`${apiUrl}/users/login`, {
+		fetch(`${apiUrl}/users/register`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -56,9 +56,8 @@ export default function SignIn() {
 						console.log(data);
 
 						if (data.success == true) {
-							router.replace('/');
 							showToast(data.message);
-							signIn(data.userData);
+							router.replace('/sign-in');
 						} else {
 							showToast(data.message);
 						}
@@ -100,20 +99,6 @@ export default function SignIn() {
 		setErrors({});
 		return true;
 	};
-	useEffect(() => {
-		const checkFirstLogin = async () => {
-			try {
-				const firstLogin = await AsyncStorage.getItem('firstLogin');
-				if (firstLogin === null) {
-					// Navigate to OnBoarding screen
-					router.push('on-board');
-				}
-			} catch (error) {
-				console.error('Failed to load first login status.', error);
-			}
-		};
-		checkFirstLogin();
-	}, [router]);
 
 	return (
 		<View
@@ -189,11 +174,11 @@ export default function SignIn() {
 					disabled={email == '' || password == ''}
 					onPress={handleLogin}
 				>
-					<Text style={styles.textButton}>Đăng nhập</Text>
+					<Text style={styles.textButton}>Đăng ký</Text>
 				</TouchableOpacity>
 			</SafeAreaView>
 			<Text style={{ fontFamily: 'LeagueLight', marginTop: 20 }}>
-				Chưa có tài khoản? <Link href="/register">Đăng ký ngay</Link>
+				Đã có tài khoản? <Link href="/sign-in">Đăng nhập</Link>
 			</Text>
 		</View>
 	);

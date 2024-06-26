@@ -46,6 +46,18 @@ export default function DiaryLayout() {
                           }}
             >
             </Stack.Screen>
+            <Stack.Screen name="chat"
+                          options={{headerTitle: 'Chat',
+                              headerLeft: () => (
+                                  <Link href="doctor">
+                                      <Text>
+                                          <Ionicons name="arrow-back-sharp" size={24} color="black" />
+                                      </Text>
+                                  </Link>
+                              )
+                          }}
+            >
+            </Stack.Screen>
             <Stack.Screen name="weight-bmi"
                           options={{
                               headerTitle: 'Cân nặng & BMI',

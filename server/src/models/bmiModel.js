@@ -10,15 +10,6 @@ const validateBeforeCreate = async (data) => {
   }
 };
 
-const getAll = async () => {
-  try {
-    const collection = await GET_DB().collection('mealPlans');
-    return await collection.find({}).toArray();
-  } catch (error) {
-    throw new Error(`Database Error: ${error.message}`);
-  }
-};
-
 const getAllByUserId = async (userId) => {
   try {
     const collection = await GET_DB().collection('mealPlans');
@@ -28,14 +19,6 @@ const getAllByUserId = async (userId) => {
   }
 };
 
-const findOne = async (id) => {
-  try {
-    const collection = await GET_DB().collection('mealPlans');
-    return await collection.findOne({ _id: new ObjectId(id) });
-  } catch (error) {
-    throw new Error(`Database Error: ${error.message}`);
-  }
-};
 const get7Time = async (userId) => {
   try {
     const collection = await GET_DB().collection('bmi');
@@ -60,14 +43,6 @@ const create = async (data) => {
   }
 };
 
-const update = async (id, data) => {
-  try {
-    const collection = await GET_DB().collection('mealPlans');
-    return await collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
-  } catch (error) {
-    throw new Error(`Update Error: ${error.message}`);
-  }
-};
 
 const updateByUserId = async (userId, data) => {
   try {
@@ -94,11 +69,8 @@ const remove = async (id) => {
 };
 
 export const bmiModel = {
-  getAll,
   getAllByUserId,
-  findOne,
   create,
-  update,
   updateByUserId,
   remove,
   get7Time
