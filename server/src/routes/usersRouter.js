@@ -6,7 +6,7 @@ import verifyToken from '~/middlewares';
 const Router = express.Router();
 
 Router.post('/register', (req, res) => usersController.register(req, res));
-Router.post('/', (req, res) => usersController.login(req, res));
+Router.post('/login', (req, res) => usersController.login(req, res));
 // name, age, gender, height, weight, fitness, nutrition, exercise, heathRate, sleep, water, comment,
 Router.put('/', verifyToken, (req, res) => usersController.update(req, res));
 Router.get('/', verifyToken, (req, res) => usersController.getU(req, res));
