@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, Platform } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Link, router } from 'expo-router'
+import { router } from 'expo-router'
 import { ExpoRouter } from 'expo-router/types/expo-router'
 import { getAllBots } from '@/services/botServices'
-import { getChatLatest, createAnswerFromBot } from '@/services/chatServices'
+import { getChatLatest } from '@/services/chatServices'
 import { formatDate } from '@/utils/helper'
 export default function DoctorScreen() {
   const [bots, setBots] = useState([])
@@ -12,11 +12,11 @@ export default function DoctorScreen() {
   const [error, setError] = useState('')
   const [selectedBot, setSelectedBot] = useState(null)
   useEffect(() => {
-    // Fetch all bots when the component mounts
     const fetchBots = async () => {
       try {
         const botsData = await getAllBots()
         setBots(botsData.data)
+        setSelectedBot(botsData.data[0])
       } catch (err: any) {
         setError(err.message)
       }
@@ -37,26 +37,24 @@ export default function DoctorScreen() {
     router.push(location)
   }
 
-  console.log(selectedBot)
-
+  const isDisableBtn = selectedBot == null
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
         <View style={styles.textContainer}>
-          <Text style={styles.questionText}>Do you have any question for a doctor?</Text>
-          {selectedBot && (
+          <Text style={styles.questionText}>Bạn có câu hỏi nào cho {selectedBot&&selectedBot.name} bác sĩ không?</Text>
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, isDisableBtn&&styles.disabledButton]}
               onPress={() => handleNavigate(`chat?botId=${selectedBot?._id}`)}
+              disabled={selectedBot == null ? true : false}
             >
               <MaterialCommunityIcons
                 name="message-text-outline"
                 color="black"
                 style={styles.icon}
               />
-              <Text style={styles.buttonText}>Ask Question</Text>
+              <Text style={styles.buttonText}>Đặt câu hỏi</Text>
             </TouchableOpacity>
-          )}
         </View>
         <Image
           resizeMode="cover"
@@ -67,9 +65,9 @@ export default function DoctorScreen() {
         />
       </View>
       <View style={styles.specialityContainer}>
-        <Text style={styles.sectionTitle}>Doctor Speciality</Text>
+        <Text style={styles.sectionTitle}>Bác sĩ chuyên khoa</Text>
         <TouchableOpacity>
-          <Text style={styles.seeAll}>See All</Text>
+          <Text style={styles.seeAll}>Xem tất cả</Text>
         </TouchableOpacity>
       </View>
       <ScrollView horizontal style={styles.specialityList}>
@@ -79,15 +77,15 @@ export default function DoctorScreen() {
             <TouchableOpacity key={index} onPress={() => setSelectedBot(bot)}>
               <View style={styles.specialityItem}>
                 <Image source={{ uri: bot.icon }} style={styles.specialityImage} />
-                <Text style={styles.specialityText}>{bot.name}</Text>
+                <Text style={[styles.specialityText, selectedBot && selectedBot._id == bot._id && styles.activeBot]}>{bot.name}</Text>
               </View>
             </TouchableOpacity>
           ))}
       </ScrollView>
       <View style={styles.historyContainer}>
-        <Text style={styles.sectionTitle}>History</Text>
+        <Text style={styles.sectionTitle}>Lịch sử</Text>
         <TouchableOpacity>
-          <Text style={styles.seeAll}>See All</Text>
+          <Text style={styles.seeAll}>Xem tất cả</Text>
         </TouchableOpacity>
       </View>
       {message &&
@@ -99,7 +97,7 @@ export default function DoctorScreen() {
             >
               <Image
                 source={{
-                  uri: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcToYUSvmTkRAvP7ZJ3eT9f4FaiJIgJnTqAwuaB2PZrIPLA4iawC',
+                  uri: item?.icon || 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcToYUSvmTkRAvP7ZJ3eT9f4FaiJIgJnTqAwuaB2PZrIPLA4iawC',
                 }}
                 style={styles.historyImage}
               />
@@ -194,9 +192,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    marginTop: 10,
   },
   sectionTitle: {
     fontSize: 18,
+    marginBottom: 10,
     fontWeight: 'bold',
   },
   seeAll: {
@@ -250,4 +250,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#757575',
   },
+  disabledButton: {
+    backgroundColor: '#757575',
+  },
+  activeBot: {
+    color: '#00796b',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  }
 })
