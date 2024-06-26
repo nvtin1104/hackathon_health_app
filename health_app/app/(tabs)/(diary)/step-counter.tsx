@@ -45,12 +45,12 @@ export default function StepCounterScreen() {
     const validateInput = () => {
         const value = Number(inputValue);
         if (isNaN(value)) {
-            alert("Input is not a number");
+            alert("Đầu vào không phải là số");
             setInputValue('');
             return;
         }
         if (value < 500 || value > 90000) {
-            alert("pls enter a number between 500 and 90000");
+            alert("Vui lòng nhập một số từ 500 đến 90000");
             setInputValue('');
             return;
         }
@@ -125,11 +125,11 @@ export default function StepCounterScreen() {
             <ScrollView style={styles.container}>
 
                 <View style={styles.goalSection}>
-                    <Text style={styles.dailyGoalText}>Daily Goal</Text>
+                    <Text style={styles.dailyGoalText}>Mục Tiêu Hàng Ngày</Text>
                     <TouchableOpacity style={styles.goalSection} onPress={() => setModalVisible(true)}>
                         <Text style={styles.goalNumber}>6000</Text>
                         <Image
-                            source={{uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg'}}
+                            source={{ uri: 'https://static.vecteezy.com/system/resources/previews/026/627/528/non_2x/edit-icon-symbol-design-illustration-vector.jpg' }}
                             style={styles.editIcon}
                         />
                     </TouchableOpacity>
@@ -146,34 +146,34 @@ export default function StepCounterScreen() {
                         inActiveStrokeOpacity={0.5}
                         inActiveStrokeWidth={40}
                         activeStrokeWidth={40}
-                        title={"Step Count"}
+                        title={"Số Bước Đi"}
                         titleColor={"#ecf0f1"}
                         titleStyle={{ fontWeight: "bold" }}
                     />
-                    <Image source={{uri: 'https://www.iconsdb.com/icons/preview/gray/gas-xxl.png'}}
-                           style={styles.fireIcon}/>
+                    <Image source={{ uri: 'https://www.iconsdb.com/icons/preview/gray/gas-xxl.png' }}
+                        style={styles.fireIcon} />
                     <Text style={styles.kcalText}>{caloriesBurnt} Kcal</Text>
                 </View>
                 <View style={styles.statsSection}>
                     <View style={styles.statBox}>
                         <Image
-                            source={{uri: 'https://static.vecteezy.com/system/resources/previews/008/925/051/non_2x/clock-icon-design-templates-free-vector.jpg'}}
-                            style={styles.clockIcon}/>
+                            source={{ uri: 'https://static.vecteezy.com/system/resources/previews/008/925/051/non_2x/clock-icon-design-templates-free-vector.jpg' }}
+                            style={styles.clockIcon} />
                         <Text style={styles.statText}>0h 0m</Text>
                     </View>
                     <View style={styles.statBox}>
                         <Image
-                            source={{uri: 'https://static.vecteezy.com/system/resources/previews/010/833/007/non_2x/arrow-icon-sign-symbol-logo-illustration-vector.jpg'}}
-                            style={styles.arrowIcon}/>
-                        <Text style={styles.statText}> Distance Covered : {DistanceCovered} km</Text>
+                            source={{ uri: 'https://static.vecteezy.com/system/resources/previews/010/833/007/non_2x/arrow-icon-sign-symbol-logo-illustration-vector.jpg' }}
+                            style={styles.arrowIcon} />
+                        <Text style={styles.statText}> Khoảng Cách Đã Đi : {DistanceCovered} km</Text>
                     </View>
                 </View>
                 <View style={styles.detailSection}>
-                    <Text style={styles.detailTitle}>Detail</Text>
+                    <Text style={styles.detailTitle}>Chi Tiết</Text>
                     <View style={styles.chart}>
                         <BarChart
                             data={data}
-                            width={Dimensions.get("window").width - 40} // subtracting 40 to add some padding
+                            width={Dimensions.get("window").width - 40} // trừ đi 40 để thêm một số đệm
                             height={220}
                             chartConfig={chartConfig}
                             fromZero={true}
@@ -205,14 +205,14 @@ export default function StepCounterScreen() {
                                 style={styles.cancelButton}
                                 onPress={() => setModalVisible(!modalVisible)}
                             >
-                                <Text >Cancel</Text>
+                                <Text >Hủy</Text>
                             </TouchableOpacity>
                             <Button
                                 style={styles.okButton}
                                 title="OK"
                                 color={inputValue === '' ? '#ccc' : '#4CAF50'}
                                 onPress={() => {
-                                    // Handle OK button press
+                                    // Xử lý khi nhấn nút OK
                                     validateInput();
                                     setModalVisible(!modalVisible);
                                 }}
