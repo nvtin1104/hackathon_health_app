@@ -15,6 +15,7 @@ import {
 	FlatList,
 	VirtualizedList,
 	ScrollView,
+	Pressable,
 } from 'react-native';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -75,7 +76,7 @@ export default function ExerciseIndexScreen() {
 		<ScrollView style={styles.container}>
 			{loading ? (
 				<FullLoading />
-			) : (
+			) : exercise ? (
 				<View>
 					<Text style={styles.title}>
 						<Text style={{ fontWeight: '600' }}>Tên bài tập:</Text>{' '}
@@ -114,6 +115,16 @@ export default function ExerciseIndexScreen() {
 						))}
 					</View>
 				</View>
+			) : (
+				<View style={styles.notFoundContainer}>
+					<Text style={styles.notFoundText}>Không có dữ liệu</Text>
+					<TouchableOpacity
+						style={[styles.button]}
+						onPress={() => router.push('/create-exercise')}
+					>
+						<Text style={styles.textButton}>Tạo bài tập mới</Text>
+					</TouchableOpacity>
+				</View>
 			)}
 		</ScrollView>
 	);
@@ -149,5 +160,24 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		fontSize: 16,
 		paddingRight: 8,
-	}
+	},
+	notFoundContainer: {
+		flex: 1,
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	notFoundText: {
+		fontSize: 20,
+		fontWeight: '600',
+	},
+	button: {
+		marginTop: 12,
+		backgroundColor: '#4CAF50',
+		padding: 12,
+		borderRadius: 12,
+	},
+	textButton: {
+		color: '#fff',
+	},
 });

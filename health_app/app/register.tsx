@@ -31,7 +31,7 @@ export default function RegisterScreen() {
 		if (!check) {
 			return;
 		}
-		fetch(`${apiUrl}/users/login`, {
+		fetch(`${apiUrl}/users/register`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -57,8 +57,7 @@ export default function RegisterScreen() {
 
 						if (data.success == true) {
 							showToast(data.message);
-							signIn(data.userData);
-							router.replace('/');
+							router.replace('/sign-in');
 						} else {
 							showToast(data.message);
 						}
@@ -100,7 +99,6 @@ export default function RegisterScreen() {
 		setErrors({});
 		return true;
 	};
-
 
 	return (
 		<View
