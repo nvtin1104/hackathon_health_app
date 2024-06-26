@@ -2,7 +2,9 @@ import { ThemedView } from '@/components/ThemedView';
 import { Iconic } from '@/components/icon/Iconic';
 import { Entypo } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState, useEffect, useCallback } from "react";import {
+import { useState, useEffect, useCallback } from 'react';
+const packageJson = require('@/package.json');
+import {
 	StyleSheet,
 	Image,
 	Alert,
@@ -12,14 +14,14 @@ import { useState, useEffect, useCallback } from "react";import {
 	FlatList,
 	VirtualizedList,
 	Switch,
-	Platform
+	Platform,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useSession } from '@/auth/ctx';
 import { useStorageState } from '@/auth/useStorageState';
 import { showToast } from '@/utils/toast';
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
 type ItemData = {
 	id: string;
@@ -44,24 +46,27 @@ const DATA: ItemData[] = [
 		title: 'Thông báo',
 		icon: 'notifications-outline',
 		toggle: true, // Add this line
+		hidden: true,
 	},
-	{
-		id: 'bd7acbea-c1da-46c2-aed5-3ad53abb28ba',
-		title: 'Cài đặt',
-		icon: 'settings-outline',
-	},
+	// {
+	// 	id: 'bd7acbea-c1da-46c2-aed5-3ad53abb28ba',
+	// 	title: 'Cài đặt',
+	// 	icon: 'settings-outline',
+	// },
 ];
 
 const DATA2: ItemData[] = [
 	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53a4b28ba',
+		id: 'rate',
 		title: 'Đánh giá',
 		icon: 'star-outline',
+		hidden: true,
 	},
 	{
-		id: 'bd7acbea-s1b1-46c2-aed5-3ad532bb28ba',
-		title: 'Phiên bản',
+		id: 'version',
+		title: `Phiên bản ${packageJson.version}`,
 		icon: 'alert-circle-outline',
+		hidden: true,
 	},
 	{
 		id: 'tas',
@@ -87,7 +92,12 @@ Notifications.setNotificationHandler({
 		shouldSetBadge: false,
 	}),
 });
-const Item = ({ item, onPress, isToggleSwitchOn, setIsToggleSwitchOn }: ItemProps) => (
+const Item = ({
+	item,
+	onPress,
+	isToggleSwitchOn,
+	setIsToggleSwitchOn,
+}: ItemProps) => (
 	<TouchableOpacity onPress={onPress} style={[styles.item]}>
 		<View style={styles.itemLeft}>
 			<Iconic name={item.icon} style={styles.icon} />
@@ -107,35 +117,38 @@ const Item = ({ item, onPress, isToggleSwitchOn, setIsToggleSwitchOn }: ItemProp
 async function registerForPushNotificationsAsync() {
 	let token;
 
-	if (Platform.OS === "android") {
-		await Notifications.setNotificationChannelAsync("default", {
-			name: "default",
+	if (Platform.OS === 'android') {
+		await Notifications.setNotificationChannelAsync('default', {
+			name: 'default',
 			importance: Notifications.AndroidImportance.MAX,
 			vibrationPattern: [0, 250, 250, 250],
-			lightColor: "#FF231F7C",
+			lightColor: '#FF231F7C',
 		});
 	}
 
 	if (Device.isDevice) {
-		const { status: existingStatus } = await Notifications.getPermissionsAsync();
+		const { status: existingStatus } =
+			await Notifications.getPermissionsAsync();
 		let finalStatus = existingStatus;
-		if (existingStatus !== "granted") {
+		if (existingStatus !== 'granted') {
 			const { status } = await Notifications.requestPermissionsAsync();
 			finalStatus = status;
 		}
-		if (finalStatus !== "granted") {
-			if (Device.brand !== "Apple" && Device.brand !== "Microsoft") { // Check if the device is not a PC
+		if (finalStatus !== 'granted') {
+			if (Device.brand !== 'Apple' && Device.brand !== 'Microsoft') {
+				// Check if the device is not a PC
 				// No alert, just return
 				return;
 			}
 		}
 		token = (
 			await Notifications.getExpoPushTokenAsync({
-				projectId: "fe578bec-6565-4590-b832-edb66bbb355f",
+				projectId: 'fe578bec-6565-4590-b832-edb66bbb355f',
 			})
 		).data;
 	} else {
-		if (Device.brand !== "Apple" && Device.brand !== "Microsoft") { // Check if the device is not a PC
+		if (Device.brand !== 'Apple' && Device.brand !== 'Microsoft') {
+			// Check if the device is not a PC
 			// No alert, just return
 			return;
 		}
@@ -148,7 +161,7 @@ export default function UserMainScreen() {
 	const { signOut } = useSession();
 	const [[isLoading, session], setSession] = useStorageState('session');
 	// Add a state variable for the notification toggle
-	const [expoPushToken, setExpoPushToken] = useState("");
+	const [expoPushToken, setExpoPushToken] = useState('');
 	const [isToggleSwitchOn, setIsToggleSwitchOn] = useState(false);
 	useEffect(() => {
 		registerForPushNotificationsAsync()
@@ -156,22 +169,21 @@ export default function UserMainScreen() {
 			.catch((err) => console.log(err));
 	}, []);
 
-
 	const sendNotification = useCallback(async () => {
 		const message = {
 			to: expoPushToken,
-			sound: "default",
-			title: "Nhắc nhở  bài tập",
-			body: "Bài tập hàng ngày của bạn đã sẵn sàng. Hãy bắt đầu ngay!",
+			sound: 'default',
+			title: 'Nhắc nhở  bài tập',
+			body: 'Bài tập hàng ngày của bạn đã sẵn sàng. Hãy bắt đầu ngay!',
 		};
 
-		await fetch("https://exp.host/--/api/v2/push/send", {
-			method: "POST",
+		await fetch('https://exp.host/--/api/v2/push/send', {
+			method: 'POST',
 			headers: {
-				host: "exp.host",
-				accept: "application/json",
-				"accept-encoding": "gzip, deflate",
-				"content-type": "application/json",
+				host: 'exp.host',
+				accept: 'application/json',
+				'accept-encoding': 'gzip, deflate',
+				'content-type': 'application/json',
 			},
 			body: JSON.stringify(message),
 		});
@@ -212,11 +224,14 @@ export default function UserMainScreen() {
 					},
 				]);
 				break;
+			case 'rate':
+				showToast('Chức năng đánh giá đang được phát triển');
+				break;
 			case 'parameter':
 				router.push('/parameter');
 				break;
 			case 'tas':
-				console.log(session);
+				router.push('/tas');
 				break;
 			case 'profile':
 				router.push('/profile');
@@ -241,7 +256,6 @@ export default function UserMainScreen() {
 	};
 	return (
 		<ThemedView style={styles.container}>
-
 			<View>
 				<Text style={styles.title}>Tổng quan</Text>
 				<FlatList

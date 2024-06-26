@@ -59,7 +59,6 @@ export default function ExerciseIndexScreen() {
 						if (data.success == true) {
 							setLoading(false);
 							setExercise(data.data);
-							console.log(data.data);
 						} else {
 							showToast('Có lỗi xảy ra, vui lòng thử lại sau');
 						}

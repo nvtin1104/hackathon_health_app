@@ -89,6 +89,28 @@ export const UPDATE_WORKOUT_PLAN = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 });
 
+// chat schema
+
+export const CREATE_BOT_SCHEMA = Joi.object({
+  name: Joi.string().required(),
+  icon: Joi.string().required(),
+  prompt: Joi.string().required(),
+})
+
+export const CREATE_MESSAGE_SCHEMA = Joi.object({
+  userId: Joi.string().required(),
+  botId: Joi.string().required(),
+  message: Joi.string().required(),
+  isBot: Joi.boolean().default(false),
+  type: Joi.string().optional().default('text'),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+})
+
+export const UPDATE_MESSAGE_SCHEMA = Joi.object({
+  message: Joi.string().required(),
+  updatedAt: Joi.date().timestamp('javascript').default(Date.now),
+})
 export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
   userId: Joi.string()
     .required()
@@ -103,6 +125,8 @@ export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
 });
 
+
+// end chat schema
 export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
   userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
   date: Joi.date().timestamp('javascript').default(Date.now),
@@ -110,4 +134,13 @@ export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
   exercises: Joi.array().default([]),
   waters: Joi.array().default([]),
   sleep: Joi.object().default({}),
+})
+
+export const CREATE_BMI_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  date: Joi.date().timestamp('javascript').default(Date.now),
+  height: Joi.number().required(),
+  weight: Joi.number().required(),
+  bmiEvaluation: Joi.string().required(),
+  bmi: Joi.number().required(),
 })

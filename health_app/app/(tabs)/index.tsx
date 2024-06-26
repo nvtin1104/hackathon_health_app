@@ -7,11 +7,23 @@ import {
 	StyleSheet,
 	Alert,
 } from 'react-native';
-import React from 'react';
+import * as SecureStore from 'expo-secure-store';
+import React, { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { ExpoRouter } from 'expo-router/types/expo-router';
 
 export default function HomeScreen() {
+	const [water, setWater] = useState({});
+	useEffect(() => {
+		const fecthData = async () => {
+			const local = await SecureStore.getItemAsync('water');
+			if (local) {
+				const data = JSON.parse(local);
+				setWater(data);
+			}
+		};
+		fecthData();
+	}, [water]);
 	const handleMeasureNowPress = () => {
 		Alert.alert('Đo Ngay', 'Bạn đã nhấn Đo Ngay!');
 	};
@@ -49,7 +61,9 @@ export default function HomeScreen() {
 					</TouchableOpacity>
 				</View>
 				<View style={styles.footer}>
-					<Text style={styles.lastReportText}>Báo cáo cuối cùng: 17 Tháng 6, 2024</Text>
+					<Text style={styles.lastReportText}>
+						Báo cáo cuối cùng: 17 Tháng 6, 2024
+					</Text>
 					<TouchableOpacity onPress={handleHistoryPress}>
 						<Text style={styles.historyText}>Lịch sử</Text>
 					</TouchableOpacity>
@@ -92,7 +106,7 @@ export default function HomeScreen() {
 							style={styles.gridImage}
 						/>
 						<Text style={styles.gridTitle}>Nhắc nhở uống nước</Text>
-						<Text style={styles.gridValue}>200/2000 ml</Text>
+						<Text style={styles.gridValue}>{water.tagert ? `${water.totalDrink}/${water.tagert} ml` : '0/2000 ml'}</Text>
 					</TouchableOpacity>
 				</View>
 				<View style={styles.gridItem}>
