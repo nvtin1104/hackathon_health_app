@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import axios from 'axios';
 import { userModal } from '~/models/userModel';
 import workoutPlanModel from '~/models/workoutPlanModel';
-import mealPlanModel from '~/models/mealPlanModel';
+import { mealPlanModel } from '~/models/mealPlanModel';
 import { dailyActModel } from '~/models/dailyActModel';
 
 const genGPTAIOverview = async (req, res) => {
@@ -39,33 +39,39 @@ const genGPTAIOverview = async (req, res) => {
       }
     }`;
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: question
+    const fetchData = async () => {
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: question }],
+          max_tokens: 4000
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
           }
-        ],
-        max_tokens: 1000
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
         }
-      }
-    );
+      );
+      return response.data.choices[0].message.content;
+    };
 
-    const messageContent = response.data.choices[0].message.content;
+    let messageContent;
 
-    const data = JSON.parse(messageContent);
+    try {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await userModal.updateById(req.user._id, { ...data, updatedAt: Date.now() });
 
-    await userModal.updateById(req.user._id, { ...data, updatedAt:  Date.now() });
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
+    } catch (error) {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await userModal.updateById(req.user._id, { ...data, updatedAt: Date.now() });
 
-    return res.status(StatusCodes.OK).json({ success: true, data });
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
+    }
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: error.message });
   }
@@ -103,7 +109,6 @@ const genGPTAIMealPlan = async (req, res) => {
           name: Vietnamese string(the name of the food, not the name of the dish),
           nutrition: Vietnamese string(nutrients contained in that food),
           qty: string (amount should be eaten at this meal)
-          calories: number(The corresponding number of calories of this dish according to qty)
         },
         ...
       ],
@@ -112,7 +117,6 @@ const genGPTAIMealPlan = async (req, res) => {
           name: Vietnamese string(the name of the food, not the name of the dish),
           nutrition: Vietnamese string(nutrients contained in that food),
           qty: string (amount should be eaten at this meal)
-          calories: number(The corresponding number of calories of this dish according to qty)
         },
         ...
       ],
@@ -121,42 +125,43 @@ const genGPTAIMealPlan = async (req, res) => {
           name: Vietnamese string(the name of the food, not the name of the dish),
           nutrition: Vietnamese string(nutrients contained in that food),
           qty: string (amount should be eaten at this meal)
-          calories: number(The corresponding number of calories of this dish according to qty)
         },
         ...
       ]
     }`;
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: question
+    const fetchData = async () => {
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: question }],
+          max_tokens: 4000
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
           }
-        ],
-        max_tokens: 3896
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
         }
-      }
-    );
+      );
+      return response.data.choices[0].message.content;
+    };
 
-    const messageContent = response.data.choices[0].message.content;
-    const data = JSON.parse(messageContent);
+    let messageContent;
+    try {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await mealPlanModel.updateByUserId(req.user._id, { meals: data, updatedAt: Date.now() });
 
-    const result = await mealPlanModel.updateByUserId(req.user._id, { meals: data, updatedAt: Date.now() });
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
+    } catch (parseError) {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await mealPlanModel.updateByUserId(req.user._id, { meals: data, updatedAt: Date.now() });
 
-    if (!data) {
-      return res.status(StatusCodes.OK).json({ success: false, msg: 'Không convert qua JSON được' });
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
     }
-
-    return res.status(StatusCodes.OK).json({ success: true, data: result });
   } catch (error) {
     return res
       .status(StatusCodes.BAD_REQUEST)
@@ -169,6 +174,7 @@ const genGPTAIWorkoutPlan = async (req, res) => {
     const user = await userModal.findOneByUserId(req.user._id);
 
     const { weight, height, age, gender, fitness, nutrition, sleep, water } = user;
+    const { goal, time, freetime } = req.body;
 
     let genderText;
 
@@ -188,9 +194,15 @@ const genGPTAIWorkoutPlan = async (req, res) => {
       break;
     }
 
-    const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day. You are a healthcare professional. Please give me training plan. 
+    const question = `I am ${age} years old and ${genderText}. I do practice ${fitness}. I am ${weight} kg, ${height} cm. I am ${nutrition} person. I am ${sleep} hour sleep. I have ${water}lit water each day.
+    My goal is ${goal}. I have ${freetime} minutes to practice. And i start at ${time}.
+    You are a healthcare professional. Please give me training plan. 
     Returns a json string remove \`\`\`json at the beginning,  \`\`\` at the end and \n as
     {
+      tilte: vietnamese string,
+      description: vietnamese string,
+      goal: vietnamese string,
+      note: vietnamese string,
       exercises: [
         {
           name: vietnamese string,
@@ -202,31 +214,50 @@ const genGPTAIWorkoutPlan = async (req, res) => {
       ]
     }`;
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: question
+    const fetchData = async () => {
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: question }],
+          max_tokens: 4000
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
           }
-        ],
-        max_tokens: 3896
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
         }
-      }
-    );
+      );
+      return response.data.choices[0].message.content;
+    };
 
-    const messageContent = response.data.choices[0].message.content;
-    const data = JSON.parse(messageContent);
-    const result = await workoutPlanModel.updateByUserId(req.user._id, { exercises: data.exercises, updatedAt: Date.now() });
+    let messageContent;
+    try {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await workoutPlanModel.updateByUserId(req.user._id, {
+        title: data.title,
+        description: data.description,
+        note: data.note,
+        exercises: data.exercises,
+        updatedAt: Date.now()
+      });
 
-    return res.status(StatusCodes.OK).json({ success: true, data: result });
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
+    } catch (parseError) {
+      messageContent = await fetchData();
+      const data = JSON.parse(messageContent);
+      const result = await workoutPlanModel.updateByUserId(req.user._id, {
+        title: data.title,
+        description: data.description,
+        note: data.note,
+        exercises: data.exercises,
+        updatedAt: Date.now()
+      });
+
+      return res.status(StatusCodes.OK).json({ success: true, data: result });
+    }
   } catch (error) {
     return res
       .status(StatusCodes.BAD_REQUEST)

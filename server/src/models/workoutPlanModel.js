@@ -30,7 +30,7 @@ const getAll = async () => {
 const getAllByUserId = async (userId) => {
   try {
     const collection = await GET_DB().collection('workoutPlans');
-    return await collection.find({ userId: new ObjectId(userId) }).toArray();
+    return await collection.findOne({ userId: new ObjectId(userId) });
   } catch (error) {
     throw new Error(`Database Error: ${error.message}`);
   }

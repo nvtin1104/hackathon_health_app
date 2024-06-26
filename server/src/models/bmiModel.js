@@ -1,10 +1,10 @@
 import { GET_DB } from '~/config/mongodb';
 import { ObjectId } from 'mongodb';
-import { CREATE_MEAL_PLAN_SCHEMA } from '~/utils/schema';
+import { CREATE_BMI_SCHEMA } from '~/utils/schema';
 
 const validateBeforeCreate = async (data) => {
   try {
-    return await CREATE_MEAL_PLAN_SCHEMA.validateAsync(data, { abortEarly: false });
+    return await CREATE_BMI_SCHEMA.validateAsync(data, { abortEarly: false });
   } catch (error) {
     throw new Error(`Validation Error: ${error.message}`);
   }
@@ -36,7 +36,14 @@ const findOne = async (id) => {
     throw new Error(`Database Error: ${error.message}`);
   }
 };
-
+const get7Time = async (userId) => {
+  try {
+    const collection = await GET_DB().collection('bmi');
+    return await collection.find({ userId: new ObjectId(userId) }).sort({ createdAt: -1 }).limit(7).toArray();
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
+}
 const create = async (data) => {
   try {
     const validData = await validateBeforeCreate(data);
@@ -45,8 +52,9 @@ const create = async (data) => {
       validData.userId = new ObjectId(validData.userId);
     }
 
-    const collection = await GET_DB().collection('mealPlans');
-    return await collection.insertOne(validData);
+    const collection = await GET_DB().collection('bmi');
+    const result = await collection.insertOne(validData);
+    return await collection.findOne({ _id: result.insertedId });
   } catch (error) {
     throw new Error(`Create Error: ${error.message}`);
   }
@@ -68,7 +76,7 @@ const updateByUserId = async (userId, data) => {
       .findOneAndUpdate(
         { userId: new ObjectId(userId) },
         { $set: data },
-        { returnDocument: 'after', upsert: true }
+        { returnDocument: 'after' }
       );
     return result;
   } catch (error) {
@@ -85,12 +93,13 @@ const remove = async (id) => {
   }
 };
 
-export const mealPlanModel = {
+export const bmiModel = {
   getAll,
   getAllByUserId,
   findOne,
   create,
   update,
   updateByUserId,
-  remove
+  remove,
+  get7Time
 };

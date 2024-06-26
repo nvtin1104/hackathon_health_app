@@ -1,7 +1,10 @@
+import { useSession } from '@/auth/ctx';
 import { ThemedView } from '@/components/ThemedView';
+import FullLoading from '@/components/loading/FullLoading';
+import { showToast } from '@/utils/toast';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	StyleSheet,
 	Image,
@@ -11,102 +14,108 @@ import {
 	TouchableOpacity,
 	FlatList,
 	VirtualizedList,
+	ScrollView,
 } from 'react-native';
-
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 import { SafeAreaView } from 'react-native-safe-area-context';
-type ItemData = {
-	id: string;
-	title: string;
-};
-type ItemDataList = {
-	id: string;
-	title: string;
-	uri: string;
-};
-const DATA: ItemData[] = [
-	{
-		id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-		title: 'Hoàn thành',
-	},
-	{
-		id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-		title: 'Chưa hoàn thành',
-	},
-];
-const getItem = (_data: unknown, index: number): ItemDataList => ({
-	id: Math.random().toString(12).substring(0),
-	uri: 'asset:/images/exercise.jpg',
-	title: `Item ${index + 1}`,
-});
 
-const getItemCount = (_data: unknown) => 50;
-const ImgUrl = require('../../../assets/images/exercise.jpg');
-type ItemPropsList = {
+interface Exercise {
 	title: string;
-	uri: string;
-	onPress: () => void;
-};
-type ItemProps = {
-	item: ItemData;
-	onPress: () => void;
-	backgroundColor: string;
-	textColor: string;
-};
-const Item = ({ item, onPress, backgroundColor, textColor }: ItemProps) => (
-	<TouchableOpacity
-		onPress={onPress}
-		style={[styles.item, { backgroundColor }]}
-	>
-		<Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
-	</TouchableOpacity>
-);
-const ItemList = ({ title, uri, onPress }: ItemPropsList) => (
-	<TouchableOpacity onPress={onPress} style={styles.itemExercise}>
-		<Image source={ImgUrl} style={styles.itemExerciseImg} />
-		<Text style={styles.itemExerciseText}>{title}</Text>
-	</TouchableOpacity>
-);
+	description: string;
+	note: string;
+	exercises: any;
+}
+
 export default function ExerciseIndexScreen() {
-	const [selectedId, setSelectedId] = useState<string>();
-	const handlePress = () => {
-		router.push('detail-exercise/1');
-	};
-	const renderItem = ({ item }: { item: ItemData }) => {
-		const backgroundColor = item.id === selectedId ? '#388E3C' : '#C8E6C9';
-		const color = item.id === selectedId ? 'white' : 'black';
-
-		return (
-			<Item
-				item={item}
-				onPress={() => setSelectedId(item.id)}
-				backgroundColor={backgroundColor}
-				textColor={color}
-			/>
-		);
-	};
+	const { session } = useSession();
+	const [loading, setLoading] = useState(true);
+	const [exercise, setExercise] = useState<Exercise>({
+		title: '',
+		description: '',
+		note: '',
+		exercises: [],
+	});
+	const data = session ? JSON.parse(session) : null;
+	useEffect(() => {
+		fetch(`${apiUrl}/wp/user`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + data.token,
+			},
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text(); // Get the raw response text
+			})
+			.then((text) => {
+				try {
+					const data = JSON.parse(text);
+					if (data.error) {
+						Alert.alert('Error', data.error);
+					} else {
+						if (data.success == true) {
+							setLoading(false);
+							setExercise(data.data);
+						} else {
+							showToast('Có lỗi xảy ra, vui lòng thử lại sau');
+						}
+					}
+				} catch (error) {
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+			});
+	}, []);
 	return (
-		<ThemedView style={styles.container}>
-			<View>
-				<FlatList
-					horizontal={true}
-					data={DATA}
-					renderItem={renderItem}
-					keyExtractor={(item) => item.id}
-					extraData={selectedId}
-				/>
-			</View>
-			<View>
-				<VirtualizedList
-					initialNumToRender={4}
-					renderItem={({ item }) => (
-						<ItemList title={item.title} uri={item.uri} onPress={handlePress} />
-					)}
-					keyExtractor={(item) => item.id}
-					getItemCount={getItemCount}
-					getItem={getItem}
-				/>
-			</View>
-		</ThemedView>
+		<ScrollView style={styles.container}>
+			{loading ? (
+				<FullLoading />
+			) : (
+				<View>
+					<Text style={styles.title}>
+						<Text style={{ fontWeight: '600' }}>Tên bài tập:</Text>{' '}
+						{exercise.title ? exercise.title : 'Bài tập không có tên'}
+					</Text>
+					<Text style={styles.description}>Mô tả:{exercise.description}</Text>
+					<Text>
+						<Text style={{ fontWeight: '600' }}>Chú ý: </Text>
+						{exercise.note}
+					</Text>
+					<View>
+						<Text style={{ fontWeight: '600', fontSize: 18 }}>
+							Các bài tập:
+						</Text>
+						{exercise.exercises.map((item: any, index: number) => (
+							<View style={styles.itemExercise} key={index}>
+								<View>
+									<Text style={styles.itemExerciseText}>
+										<Text style={styles.item}>Tên bài tập:</Text>
+										{item.name}
+									</Text>
+									<Text style={styles.itemExerciseText}>
+										<Text style={styles.item}>Thời gian:</Text>
+										{item.time}
+									</Text>
+									<Text style={styles.itemExerciseText}>
+										<Text style={styles.item}>Luyện tập:</Text>
+										{item.practice}
+									</Text>
+									<Text style={styles.itemExerciseText}>
+										<Text style={styles.item}>Chú ý:</Text>
+										{item.note}
+									</Text>
+								</View>
+							</View>
+						))}
+					</View>
+				</View>
+			)}
+		</ScrollView>
 	);
 }
 
@@ -114,35 +123,31 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 12,
-	},
-	content: {
-		backgroundColor: '#F5F5F5',
-	},
-	item: {
-		padding: 8,
-		borderRadius: 8,
-		marginVertical: 4,
-		marginHorizontal: 8,
+		margin: 24,
+		backgroundColor: '#fff',
+		borderRadius: 12,
 	},
 	title: {
-		fontSize: 12,
+		fontSize: 20,
+		marginVertical: 12,
 	},
+	description: {},
 	itemExercise: {
 		backgroundColor: '#C8E6C9',
 		marginVertical: 8,
-		marginHorizontal: 16,
 		padding: 12,
 		borderRadius: 12,
 		display: 'flex',
 		flexDirection: 'row',
 	},
-	itemExerciseImg: {
-		width: 80,
-		height: 80,
-		borderRadius: 8,
-	},
+
 	itemExerciseText: {
 		marginLeft: 12,
 		fontSize: 16,
 	},
+	item: {
+		fontWeight: '600',
+		fontSize: 16,
+		paddingRight: 8,
+	}
 });
