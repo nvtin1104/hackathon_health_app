@@ -16,7 +16,8 @@ const START_SERVER = () => {
 
   app.use(cookieParser());
 
-  app.use(cors(corsOptions));
+  // app.use(cors(corsOptions));
+  app.use(cors());
 
   app.use(express.json());
 
@@ -32,8 +33,8 @@ const START_SERVER = () => {
   // -------------------
 
   if (env.BUILD_MODE === 'production') {
-    server.listen(process.env.PORT, () => {
-      console.log(`Server is running at ${process.env.PORT}`);
+    server.listen(env.APP_PORT, () => {
+      console.log(`Server is running at ${env.APP_PORT}`);
     });
   } else {
     server.listen(env.APP_PORT, env.APP_HOST, () => {

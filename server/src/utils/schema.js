@@ -10,8 +10,8 @@ export const SAVE_USER_SCHEMA = Joi.object({
   email: Joi.string()
     .required()
     .email({ tlds: { allow: false } }),
-  tokenGG: Joi.string().required(),
-
+  password: Joi.string().required(),
+  token: Joi.string().default(null),
   name: Joi.string().default(null),
   age: Joi.number().min(1).max(100).default(null),
   gender: Joi.number().default(3).min(1).max(3),
@@ -23,10 +23,13 @@ export const SAVE_USER_SCHEMA = Joi.object({
   nutrition: Joi.string().default(null),
 
   exercise: Joi.number().default(null),
-  heathRate: Joi.number().default(null),
+  healthRate: Joi.number().default(null),
   sleep: Joi.number().default(null),
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
+
+  goal: Joi.string().default(null),
+  pathological: Joi.string().default(null),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -48,19 +51,27 @@ export const UPDATE_USER = Joi.object({
   sleep: Joi.number().default(null),
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
+
+  goal: Joi.string().default(null),
+  pathological: Joi.string().default(null),
 });
 
 export const CREATE_WORKOUT_PLAN_SCHEMA = Joi.object({
-  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-  exercises: Joi.array().required().items(
-    Joi.object({
-      name: Joi.string().required(),
-      time: Joi.number().default(null), // minutes
-      qty: Joi.number().default(null),
-      note: Joi.string().default(null),
-      completed: Joi.boolean().default(false),
-    })
-  ),
+  userId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
+  exercises: Joi.array()
+    .required()
+    .items(
+      Joi.object({
+        name: Joi.string().required(),
+        time: Joi.number().default(null), // minutes
+        qty: Joi.number().default(null),
+        note: Joi.string().default(null),
+        completed: Joi.boolean().default(false),
+      })
+    ),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
 });
@@ -77,3 +88,59 @@ export const UPDATE_WORKOUT_PLAN = Joi.object({
   ),
   updatedAt: Joi.date().timestamp('javascript').default(Date.now),
 });
+
+// chat schema
+
+export const CREATE_BOT_SCHEMA = Joi.object({
+  name: Joi.string().required(),
+  icon: Joi.string().required(),
+  prompt: Joi.string().required(),
+})
+
+export const CREATE_MESSAGE_SCHEMA = Joi.object({
+  userId: Joi.string().required(),
+  botId: Joi.string().required(),
+  message: Joi.string().required(),
+  isBot: Joi.boolean().default(false),
+  type: Joi.string().optional().default('text'),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+})
+
+export const UPDATE_MESSAGE_SCHEMA = Joi.object({
+  message: Joi.string().required(),
+  updatedAt: Joi.date().timestamp('javascript').default(Date.now),
+})
+export const CREATE_MEAL_PLAN_SCHEMA = Joi.object({
+  userId: Joi.string()
+    .required()
+    .pattern(OBJECT_ID_RULE)
+    .message(OBJECT_ID_RULE_MESSAGE),
+  meals: Joi.object({
+    breakfast: Joi.string().default(null),
+    lunch: Joi.string().default(null),
+    dinner: Joi.string().default(null),
+  }),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
+});
+
+
+// end chat schema
+export const CREATE_DAILY_ACT_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  date: Joi.date().timestamp('javascript').default(Date.now),
+  meals: Joi.object().default({}),
+  exercises: Joi.array().default([]),
+  waters: Joi.array().default([]),
+  sleep: Joi.object().default({}),
+})
+
+export const CREATE_BMI_SCHEMA = Joi.object({
+  userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+  date: Joi.date().timestamp('javascript').default(Date.now),
+  height: Joi.number().required(),
+  weight: Joi.number().required(),
+  bmiEvaluation: Joi.string().required(),
+  bmi: Joi.number().required(),
+})

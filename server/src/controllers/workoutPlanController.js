@@ -1,5 +1,6 @@
 import workoutPlanModel from '~/models/workoutPlanModel';
 import { StatusCodes } from 'http-status-codes';
+import { dailyActApi } from './../routes/dailyActRouter';
 
 const getAll = async (req, res) => {
   try {
@@ -14,8 +15,8 @@ const getAll = async (req, res) => {
 
 const getAllByUserId = async (req, res) => {
   try {
-    const { userId } = req.userId;
-    const data = await workoutPlanModel.getAllByUserId(userId);
+    const { _id } = req.user;
+    const data = await workoutPlanModel.getAllByUserId(_id);
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
@@ -40,13 +41,13 @@ const findOne = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { user_id } = req.user;
+    const userId = req.user._id;
 
-    if (!user_id) {
+    if (!userId) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
     }
 
-    const data = await workoutPlanModel.create({ userId: user_id, ...req.body });
+    const data = await workoutPlanModel.create({ userId, ...req.body });
 
     return res.status(StatusCodes.OK).json({ success: true, data });
   } catch (error) {
