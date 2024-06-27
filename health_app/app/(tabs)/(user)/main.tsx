@@ -1,6 +1,7 @@
 import { ThemedView } from '@/components/ThemedView';
 import { Iconic } from '@/components/icon/Iconic';
-import { Entypo } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+
 import { router } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 const packageJson = require('@/package.json');
@@ -219,6 +220,7 @@ export default function UserMainScreen() {
 						onPress: () => {
 							signOut();
 							showToast('Đã đăng xuất khỏi hệ thống');
+							SecureStore.deleteItemAsync("token")
 							router.replace('/sign-in');
 						},
 					},

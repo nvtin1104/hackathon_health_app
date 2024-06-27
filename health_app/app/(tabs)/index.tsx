@@ -11,9 +11,12 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { ExpoRouter } from 'expo-router/types/expo-router';
+import { useSession } from '@/auth/ctx';
 
 export default function HomeScreen() {
+	const { session } = useSession();
 	const [water, setWater] = useState({});
+	const data = session ? JSON.parse(session) : null;
 	useEffect(() => {
 		const fecthData = async () => {
 			const local = await SecureStore.getItemAsync('water');
@@ -94,7 +97,7 @@ export default function HomeScreen() {
 							style={styles.gridImage}
 						/>
 						<Text style={styles.gridTitle}>Cân nặng & BMI</Text>
-						<Text style={styles.gridValue}>-- KG</Text>
+						<Text style={styles.gridValue}>{data.weight} KG</Text>
 					</TouchableOpacity>
 				</View>
 				<View style={styles.gridItem}>
@@ -106,7 +109,11 @@ export default function HomeScreen() {
 							style={styles.gridImage}
 						/>
 						<Text style={styles.gridTitle}>Nhắc nhở uống nước</Text>
-						<Text style={styles.gridValue}>{water.tagert ? `${water.totalDrink}/${water.tagert} ml` : '0/2000 ml'}</Text>
+						<Text style={styles.gridValue}>
+							{water.tagert
+								? `${water.totalDrink}/${water.tagert} ml`
+								: '0/2000 ml'}
+						</Text>
 					</TouchableOpacity>
 				</View>
 				<View style={styles.gridItem}>

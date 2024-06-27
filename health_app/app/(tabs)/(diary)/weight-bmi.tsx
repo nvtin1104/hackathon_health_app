@@ -3,26 +3,29 @@ import {
 	Button,
 	Dimensions,
 	StyleSheet,
-	Image,
-	Platform,
 	View,
 	Text,
 	TouchableOpacity,
 	ScrollView,
 	Alert,
+	Modal,
+	Pressable,
+	TextInput,
 } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
 import { showToast } from '@/utils/toast';
 import { useSession } from '@/auth/ctx';
 import FullLoading from '@/components/loading/FullLoading';
+
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-const averageBMI = (bmiArray: any) => {
-	const sum = bmiArray.reduce((a: any, b: any) => a + b, 0);
-	const avg = sum / bmiArray.length;
-	return avg.toFixed(2); // Làm tròn giá trị trung bình thành hai chữ số sau dấu thập phân
+
+const averageBMI = (bmiArray: number[]) => {
+	const sum = bmiArray.reduce((a, b) => a + b, 0);
+	return (sum / bmiArray.length).toFixed(2);
 };
+
 export default function WeighBMIScreen() {
+	const [modalVisible, setModalVisible] = useState(false);
 	const { session } = useSession();
 	const user = session ? JSON.parse(session) : null;
 	const [loading, setLoading] = useState(true);
@@ -31,11 +34,10 @@ export default function WeighBMIScreen() {
 			datasets: [
 				{
 					data: [0],
-					color: (opacity = 1) => `rgba(76,175,80, ${opacity})`, // optional
-					strokeWidth: 2, // optional
+					color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
+					strokeWidth: 2,
 				},
 			],
-			// legend: ["Rainy Days"] // optional
 		},
 		min: 0,
 		max: 0,
@@ -46,111 +48,141 @@ export default function WeighBMIScreen() {
 			datasets: [
 				{
 					data: [0],
-					color: (opacity = 1) => `rgba(76,175,80, ${opacity})`, // optional
-					strokeWidth: 2, // optional
+					color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
+					strokeWidth: 2,
 				},
 			],
-			// legend: ["Rainy Days"] // optional
 		},
 		min: 0,
 		max: 0,
 		avg: 0,
 	});
+	const [weight, onChangeWeight] = useState('');
+	const [height, onChangeHeight] = useState('');
+
 	const fecthData = async () => {
-		fetch(`${apiUrl}/bmi/7time`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: 'Bearer ' + user.token,
-			},
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-				return response.text(); // Get the raw response text
-			})
-			.then((text) => {
-				try {
-					const data = JSON.parse(text);
-					if (data.error) {
-						Alert.alert('Error', data.error);
-					} else {
-						if (data.success == true) {
-							setLoading(false);
-							const weight = data.data.map((item: any) => item.weight);
-							const bmi = data.data.map((item: any) => item.bmi);
-							setWeightData({
-								dataChart: {
-									datasets: [
-										{
-											data: weight,
-											color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
-											strokeWidth: 2, // optional
-										},
-									],
-									// legend: ["Rainy Days"] // optional
-								},
-								min: Math.min(...weight),
-								max: Math.max(...weight),
-								avg: averageBMI(weight),
-							});
-							setBmiData({
-								dataChart: {
-									datasets: [
-										{
-											data: bmi,
-											color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
-											strokeWidth: 2, // optional
-										},
-									],
-									// legend: ["Rainy Days"] // optional
-								},
-								min: Math.min(...bmi),
-								max: Math.max(...bmi),
-								avg: averageBMI(bmi),
-							});
-						} else {
-							showToast('Có lỗi xảy ra, vui lòng thử lại sau');
-						}
-					}
-				} catch (error) {
-					Alert.alert('Error', 'Failed to parse server response');
-				}
-			})
-			.catch((error) => {
-				Alert.alert('Error', error.message);
+		try {
+			const response = await fetch(`${apiUrl}/bmi/7time`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.token}`,
+				},
 			});
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const text = await response.text();
+			const data = JSON.parse(text);
+			if (data.error) {
+				Alert.alert('Error', data.error);
+			} else if (data.success) {
+				setLoading(false);
+				const weight = data.data.map((item: any) => item.weight);
+				const bmi = data.data.map((item: any) => item.bmi);
+				setWeightData({
+					dataChart: {
+						datasets: [
+							{
+								data: weight,
+								color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
+								strokeWidth: 2,
+							},
+						],
+					},
+					min: Math.min(...weight),
+					max: Math.max(...weight),
+					avg: averageBMI(weight),
+				});
+				setBmiData({
+					dataChart: {
+						datasets: [
+							{
+								data: bmi,
+								color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
+								strokeWidth: 2,
+							},
+						],
+					},
+					min: Math.min(...bmi),
+					max: Math.max(...bmi),
+					avg: averageBMI(bmi),
+				});
+			} else {
+				showToast('Có lỗi xảy ra, vui lòng thử lại sau');
+			}
+		} catch (error) {
+			Alert.alert('Error', error.message);
+		}
+	};
+	const addRecord = async (weight: number, height: number) => {
+		try {
+			const response = await fetch(`${apiUrl}/bmi`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.token}`,
+				},
+				body: JSON.stringify({
+					weight,
+					height,
+				}),
+			});
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const text = await response.text();
+			const data = JSON.parse(text);
+			if (data.error) {
+				Alert.alert('Error', data.error);
+			} else if (data.success) {
+				setLoading(false);
+				setModalVisible(false);
+				showToast(`Thêm bản ghi thành công. BMI: ${data.data.bmi}. Đánh giá: ${data.data.bmiEvaluation}`);
+				fecthData();
+			} else {
+				showToast('Có lỗi xảy ra, vui lòng thử lại sau');
+			}
+		} catch (error: any) {
+			Alert.alert('Error', error.message);
+		}
+	};
+	const handleSubmit = async () => {
+		const result = validateInput(weight, height);
+		if (result !== true) {
+			showToast(result);
+			return;
+		}
+		await addRecord(Number(weight), Number(height));
+
 	};
 	useEffect(() => {
 		fecthData();
 	}, []);
-	const data = {
-		datasets: [
-			{
-				data: [20, 45, 28, 80, 99, 43],
-				color: (opacity = 1) => `rgba(76,175,80, ${opacity})`, // optional
-				strokeWidth: 2, // optional
-			},
-		],
-		legend: ['Rainy Days'], // optional
+	const validateInput = (weight: any, height: any) => {
+		const w = Number(weight);
+		const h = Number(height);
+		if (isNaN(w) || isNaN(h)) {
+			return 'Giá trị nhập không phải là số';
+		}
+		if (w < 2 || w > 200) {
+			return 'Cân nặng phải trong khoảng 2 đến 200 kg';
+		}
+		if (h < 40 || h > 300) {
+			return 'Chiều cao phải trong khoảng 40 đến 300 cm';
+		}
+		return true;
 	};
-
 	const chartConfig = {
 		backgroundGradientFrom: '#fff',
 		backgroundGradientFromOpacity: 0,
 		backgroundGradientTo: '#fff',
 		backgroundGradientToOpacity: 0.5,
 		color: (opacity = 1) => `rgba(126, 126, 126, ${opacity})`,
-		strokeWidth: 2, // optional, default 3
+		strokeWidth: 2,
 		barPercentage: 0.5,
-		useShadowColorFromDataset: false, // optional
+		useShadowColorFromDataset: false,
 	};
-	const [selectedDate, setSelectedDate] = useState(new Date(2023, 5, 19)); // Start date
-	const [endDate, setEndDate] = useState(new Date(2024, 5, 19)); // End date
-	const [showDatePicker, setShowDatePicker] = useState(false);
-	let date = new Date();
-	date.setDate(date.getDate() - 30);
 
 	return (
 		<>
@@ -158,39 +190,12 @@ export default function WeighBMIScreen() {
 				<FullLoading />
 			) : (
 				<ScrollView style={styles.container}>
-					{/* <View style={styles.dateRange}>
-				<Text style={styles.dateRangeText}> Chi tiết</Text>
-				<Text style={styles.dateRangeTextShow}>
-					{' '}
-					{`${selectedDate.toLocaleDateString()} `}{' '}
-				</Text>
-				<Text style={styles.dateRangeText}>
-					<TouchableOpacity onPress={() => setShowDatePicker(true)}>
-						<Image
-							source={{
-								uri: 'https://cdn-icons-png.flaticon.com/512/107/107799.png',
-							}}
-							style={styles.editIcon}
-						/>
-					</TouchableOpacity>
-
-					{showDatePicker && (
-						<RNDateTimePicker
-							value={selectedDate}
-							onChange={(event, selectedDate) => {
-								if (selectedDate) {
-									setSelectedDate(selectedDate);
-								}
-								setShowDatePicker(Platform.OS === 'ios' ? true : false);
-							}}
-							dateFormat="dayofweek day month"
-							minimumDate={date} // 7 ngày trước ngày hôm nay
-							maximumDate={new Date()} // Ngày hôm nay
-						/>
-					)}
-				</Text>
-			</View> */}
-
+					<Pressable
+						style={styles.addButton}
+						onPress={() => setModalVisible(true)}
+					>
+						<Text style={styles.addButtonText}>+ Thêm bản ghi</Text>
+					</Pressable>
 					<View style={styles.card}>
 						<Text style={styles.cardTitle}>Cân nặng</Text>
 						<Text style={styles.unit}>Đơn vị: kg</Text>
@@ -211,14 +216,13 @@ export default function WeighBMIScreen() {
 						<View style={styles.chart}>
 							<BarChart
 								data={weightData.dataChart}
-								width={Dimensions.get('window').width - 40} // trừ 40 để thêm một số padding
+								width={Dimensions.get('window').width - 40}
 								height={220}
 								chartConfig={chartConfig}
-								fromZero={true}
+								fromZero
 							/>
 						</View>
 					</View>
-
 					<View style={styles.card}>
 						<Text style={styles.cardTitle}>BMI</Text>
 						<View style={styles.stats}>
@@ -238,17 +242,50 @@ export default function WeighBMIScreen() {
 						<View style={styles.chart}>
 							<BarChart
 								data={bmiData.dataChart}
-								width={Dimensions.get('window').width - 40} // trừ 40 để thêm một số padding
+								width={Dimensions.get('window').width - 40}
 								height={220}
 								chartConfig={chartConfig}
-								fromZero={true}
+								fromZero
 							/>
 						</View>
+						<Modal
+							animationType="fade"
+							transparent={true}
+							visible={modalVisible}
+							onRequestClose={() => {
+								setModalVisible(!modalVisible);
+							}}
+						>
+							<View style={styles.centeredView}>
+								<View style={styles.modalView}>
+									<Text style={styles.modalText}>Thêm bản ghi BMI!</Text>
+									<View style={styles.inputContainer}>
+										<Text style={styles.inputText}>Cân nặng:</Text>
+										<TextInput
+											style={styles.input}
+											onChangeText={onChangeWeight}
+											value={weight}
+											placeholder="Cân nặng"
+											keyboardType="numeric"
+										/>
+									</View>
+									<View style={styles.inputContainer}>
+										<Text style={styles.inputText}>Chiều cao:</Text>
+										<TextInput
+											style={styles.input}
+											onChangeText={onChangeHeight}
+											value={height}
+											placeholder="Chiều cao"
+											keyboardType="numeric"
+										/>
+									</View>
+									<Pressable style={styles.button} onPress={handleSubmit}>
+										<Text style={styles.textStyle}>Lưu</Text>
+									</Pressable>
+								</View>
+							</View>
+						</Modal>
 					</View>
-
-					<TouchableOpacity style={styles.addButton}>
-						<Text style={styles.addButtonText}>+ Thêm bản ghi</Text>
-					</TouchableOpacity>
 				</ScrollView>
 			)}
 		</>
@@ -256,34 +293,25 @@ export default function WeighBMIScreen() {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#E5E5E5' },
-	header: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		backgroundColor: '#4CAF50',
+	container: {
+		flex: 1,
+		backgroundColor: '#E5E5E5',
+	},
+	card: {
+		backgroundColor: '#FFF',
+		margin: 16,
+		borderRadius: 8,
 		padding: 16,
 	},
-	backButton: { fontSize: 24, color: '#FFF' },
-	headerTitle: { fontSize: 20, color: '#FFF', fontWeight: 'bold' },
-	headerIcons: {
-		flexDirection: 'row',
-	},
-	icon: { fontSize: 24, color: '#FFF', marginLeft: 16 },
-	dateRange: {
-		flexDirection: 'row',
-		backgroundColor: '#4CAF50',
-		padding: 8,
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	dateRangeText: { color: '#FFF', fontSize: 16 },
-	card: { backgroundColor: '#FFF', margin: 16, borderRadius: 8, padding: 16 },
 	cardTitle: {
 		fontSize: 18,
 		fontWeight: 'bold',
 	},
-	unit: { alignSelf: 'flex-end', fontSize: 14, color: '#555' },
+	unit: {
+		alignSelf: 'flex-end',
+		fontSize: 14,
+		color: '#555',
+	},
 	stats: {
 		flexDirection: 'row',
 		justifyContent: 'space-around',
@@ -292,16 +320,17 @@ const styles = StyleSheet.create({
 	stat: {
 		alignItems: 'center',
 	},
-	statLabel: { fontSize: 14, color: '#555' },
+	statLabel: {
+		fontSize: 14,
+		color: '#555',
+	},
 	statValue: {
 		fontSize: 24,
 		fontWeight: 'bold',
 	},
-	chart: { alignItems: 'center', marginVertical: 16 },
-	chartValue: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		color: '#4CAF50',
+	chart: {
+		alignItems: 'center',
+		marginVertical: 16,
 	},
 	addButton: {
 		backgroundColor: '#4CAF50',
@@ -315,15 +344,61 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 	},
-	editIcon: {
-		width: 20,
-		height: 20,
+	centeredView: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: 22,
+		backgroundColor: 'rgba(0,0,0,0.5)',
 	},
-	dateRangeTextShow: {
-		backgroundColor: '#ffffff',
-		color: '#4CAF50',
-		padding: 5,
-		borderRadius: 10,
+	modalView: {
+		margin: 20,
+		backgroundColor: 'white',
+		borderRadius: 20,
+		padding: 35,
+		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5,
+	},
+	inputContainer: {
+		marginVertical: 8,
+	},
+	inputText: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginBottom: 8,
+	},
+	input: {
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		width: 240,
+		borderRadius: 24,
+		borderColor: '#ccc',
+		borderWidth: 2,
+	},
+	button: {
+		backgroundColor: '#4CAF50',
+		borderRadius: 20,
+		marginTop: 16,
+		padding: 10,
+		elevation: 2,
+		width: 240,
+	},
+	textStyle: {
+		color: 'white',
+		fontWeight: 'bold',
+		textAlign: 'center',
+	},
+	modalText: {
+		marginBottom: 15,
+		textAlign: 'center',
+		fontSize: 20,
 		fontWeight: 'bold',
 	},
 });

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
-// Base URL for the API
-const API_BASE_URL = Constants.manifest?.extra?.apiBaseUrl || 'https://climbing-grouper-mildly.ngrok-free.app';
+import * as SecureStore from 'expo-secure-store';
 
+// Base URL for the API
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://climbing-grouper-mildly.ngrok-free.app';
 // Create an instance of axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -23,15 +23,20 @@ apiClient.interceptors.request.use(
 );
 
 const getToken = async () => {
-  const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhMjJmMzhmN2ViNWYwODhkYzFlZGEiLCJlbWFpbCI6InRhYmxldGtpbmRmaXJlQGdtYWlsLmNvbSIsImlhdCI6MTcxOTI4MDU2NiwiZXhwIjoxNzIxODcyNTY2fQ.vOpcauPMidEW3L1bE2wa7Lvsbx_BZG-vTtd8zc2UwTI`
-  return token;
+  try {
+    const token = await SecureStore.getItemAsync('token');
+    return token !== null ? token : null;
+  } catch (error) {
+    console.error('Failed to fetch the token from AsyncStorage', error);
+    return null;
+  }
 };
 
 // define const API
 
-export const CREATE_CHAT = '/api/chat/message'
-export const GET_CHAT_HISTORY = '/api/chat'
-export const CREATE_BOT_ANSWER = '/api/chat/answer'
+export const CREATE_CHAT = '/chat/message'
+export const GET_CHAT_HISTORY = '/chat'
+export const CREATE_BOT_ANSWER = '/chat/answer'
 
 
 export default apiClient
