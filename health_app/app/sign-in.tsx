@@ -19,6 +19,7 @@ import { showToast } from '@/utils/toast';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 import Entypo from '@expo/vector-icons/Entypo';
 import { Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SignIn() {
   const { signIn } = useSession();
   const [password, onChangePassword] = useState('');

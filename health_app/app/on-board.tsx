@@ -22,10 +22,10 @@ const OnBoardingScreen = () => {
     return (
       <TouchableOpacity
         onPress={handleSkip}
-        style={{ marginRight: 20, backgroundColor: 'red' }}
+        style={styles.button}
       >
         <View>
-          <Text style={{ fontSize: 16, color: 'red' }}>Khám phá ngays</Text>
+          <Text style={{ fontSize: 16, color: '#fff' }}>Khám phá ngay</Text>
         </View>
       </TouchableOpacity>
     );
@@ -84,4 +84,11 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width * 0.8,
     height: Dimensions.get('window').height * 0.4,
   },
+  button: {
+    backgroundColor: colorTheme.background.primary,
+    padding: 10,
+    // borderRadius: 10\
+    width:Dimensions.get('window').width, 
+    alignItems: 'center',
+  }
 });
