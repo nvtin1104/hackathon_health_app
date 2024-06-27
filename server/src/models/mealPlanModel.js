@@ -27,7 +27,14 @@ const getAllByUserId = async (userId) => {
     throw new Error(`Database Error: ${error.message}`);
   }
 };
-
+const getMeal = async (userId) => {
+  try {
+    const collection = await GET_DB().collection('mealPlans');
+    return await collection.findOne({ userId: new ObjectId(userId) });
+  } catch (error) {
+    throw new Error(`Database Error: ${error.message}`);
+  }
+};
 const findOne = async (id) => {
   try {
     const collection = await GET_DB().collection('mealPlans');
@@ -92,5 +99,6 @@ export const mealPlanModel = {
   create,
   update,
   updateByUserId,
-  remove
+  remove,
+  getMeal
 };
