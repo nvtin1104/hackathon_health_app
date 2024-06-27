@@ -160,7 +160,6 @@ async function registerForPushNotificationsAsync() {
 
 export default function UserMainScreen() {
 	const { signOut } = useSession();
-	const [[isLoading, session], setSession] = useStorageState('session');
 	// Add a state variable for the notification toggle
 	const [expoPushToken, setExpoPushToken] = useState('');
 	const [isToggleSwitchOn, setIsToggleSwitchOn] = useState(false);
@@ -190,6 +189,7 @@ export default function UserMainScreen() {
 		});
 	}, [expoPushToken]);
 
+
 	useEffect(() => {
 		let intervalId;
 
@@ -206,6 +206,7 @@ export default function UserMainScreen() {
 		};
 	}, [isToggleSwitchOn, sendNotification]);
 
+	console.log("expoPushToken",expoPushToken)
 	//
 	const handlePress = (id: string) => {
 		switch (id) {

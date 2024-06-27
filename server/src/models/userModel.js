@@ -3,7 +3,7 @@
 /* eslint-disable semi */
 import { GET_DB } from '~/config/mongodb';
 import { ObjectId } from 'mongodb';
-import { SAVE_USER_SCHEMA, UPDATE_USER } from '~/utils/schema';
+import { SAVE_USER_SCHEMA, UPDATE_USER, UPDATE_USER_SETTING_NOTIFICATION_SCHEMA } from '~/utils/schema';
 
 const validateBeforeCreate = async (data) => {
   return await SAVE_USER_SCHEMA.validateAsync(data, { abortEarly: false });
@@ -192,6 +192,24 @@ const findOneByUserId = async (userId) => {
 };
 
 
+const updateNotification = async (id, payload) => {
+  try {
+    const validData = await UPDATE_USER_SETTING_NOTIFICATION_SCHEMA.validateAsync(payload, { abortEarly: false });;
+    const db = await GET_DB();
+    const collection = db.collection('users');
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: payload}
+    );
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      mgs: 'Có lỗi xảy ra xin thử lại sau',
+    };
+  }
+};
+
 export const userModal = {
   register,
   updateLogin,
@@ -203,4 +221,5 @@ export const userModal = {
   findOneByUserId,
   update,
   changePassWord,
+  updateNotification
 };
