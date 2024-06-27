@@ -145,6 +145,7 @@ export const CREATE_BMI_SCHEMA = Joi.object({
 })
 
 export const UPDATE_USER_SETTING_NOTIFICATION_SCHEMA = Joi.object({
+  enableNotification: Joi.boolean().required().default(true),
   notificationToken: Joi.string().required(),
   timeSendNotification: Joi.number().required()
 })

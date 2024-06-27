@@ -9,6 +9,7 @@ import { corsOptions } from './config/cors';
 import http from 'http';
 import cookieParser from 'cookie-parser';
 import { APIs } from './routes';
+import cronJob from './utils/cron';
 const START_SERVER = () => {
   const app = express();
 
@@ -54,6 +55,7 @@ const START_SERVER = () => {
     await CONNECT_DB();
     console.log('Connect to MongoDB Atlas successfully');
     START_SERVER();
+    cronJob()
   } catch (error) {
     console.log(error);
     process.exit(0);

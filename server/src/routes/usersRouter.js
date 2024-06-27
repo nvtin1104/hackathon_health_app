@@ -13,6 +13,9 @@ Router.get('/', verifyToken, (req, res) => usersController.getU(req, res));
 Router.put('/changePass', verifyToken, (req, res) =>
   usersController.changePassWord(req, res)
 );
+Router.put('/notification', verifyToken, (req, res) =>
+  usersController.updateNotification(req, res)
+);
 
 Router.get('/test', verifyToken, (req, res) => usersController.test(req, res));
 Router.get('/:id', (req, res) => usersController.getUserID(req, res));
