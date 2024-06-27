@@ -19,7 +19,6 @@ import { showToast } from '@/utils/toast';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 import Entypo from '@expo/vector-icons/Entypo';
 import { Link } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function SignIn() {
   const { signIn } = useSession();
   const [password, onChangePassword] = useState('');
@@ -55,22 +54,24 @@ export default function SignIn() {
           } else {
             console.log(data);
 
-            if (data.success == true) {
-              router.replace('/');
-              showToast(data.message);
-              signIn(data.userData);
-            } else {
-              showToast(data.message);
-            }
-          }
-        } catch (error) {
-          Alert.alert('Error', 'Failed to parse server response');
-        }
-      })
-      .catch((error) => {
-        Alert.alert('Error', error.message);
-      });
-  };
+
+						if (data.success == true) {
+							router.replace('/');
+							showToast(data.message);
+							SecureStore.setItemAsync("token", data.userData.token);
+							signIn(data.userData);
+						} else {
+							showToast(data.message);
+						}
+					}
+				} catch (error) {
+					Alert.alert('Error', 'Failed to parse server response');
+				}
+			})
+			.catch((error) => {
+				Alert.alert('Error', error.message);
+			});
+	};
 
   type Errors = {
     email?: string;

@@ -5,6 +5,7 @@ import { StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+import { colorTheme } from '@/utils/colors';
 
 export function Collapsible({
 	children,
@@ -41,7 +42,12 @@ const styles = StyleSheet.create({
 		gap: 6,
 	},
 	container: {
-		padding: 12,
+		paddingVertical: 24,
+		paddingHorizontal: 16,
+		borderWidth: 2,
+		borderColor: '#ccc',
+		borderRadius: 24,
+		marginVertical: 12,
 	},
 	title: {
 		fontSize: 18,

@@ -220,6 +220,7 @@ export default function UserMainScreen() {
 						onPress: () => {
 							signOut();
 							showToast('Đã đăng xuất khỏi hệ thống');
+							SecureStore.deleteItemAsync("token")
 							router.replace('/sign-in');
 						},
 					},

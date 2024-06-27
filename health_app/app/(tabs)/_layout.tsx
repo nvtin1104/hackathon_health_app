@@ -48,6 +48,18 @@ function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
+				name="(meals)"
+				options={{
+					title: 'Thực đơn',
+					tabBarIcon: ({ color, focused }) => (
+						<TabBarIcon
+							name={focused ? 'fast-food' : 'fast-food-outline'}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name="(user)"
 				options={{
 					title: 'Cá nhân',

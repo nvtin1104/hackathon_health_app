@@ -17,7 +17,6 @@ import { useSession } from '@/auth/ctx';
 import { router } from 'expo-router';
 import { showToast } from '@/utils/toast';
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Link } from 'expo-router';
 export default function RegisterScreen() {
