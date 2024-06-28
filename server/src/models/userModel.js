@@ -191,6 +191,12 @@ const findOneByUserId = async (userId) => {
   }
 };
 
+const getAllUsers = async(conditions = {}) => {
+  const collection = await GET_DB().collection("users");
+
+  return await collection.find(conditions).toArray();
+};
+
 
 export const userModal = {
   register,
@@ -203,4 +209,5 @@ export const userModal = {
   findOneByUserId,
   update,
   changePassWord,
+  getAllUsers
 };

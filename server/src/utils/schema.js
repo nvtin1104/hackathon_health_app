@@ -51,7 +51,6 @@ export const UPDATE_USER = Joi.object({
   sleep: Joi.number().default(null),
   water: Joi.number().default(null),
   comment: Joi.string().default(null),
-
   goal: Joi.string().default(null),
   pathological: Joi.string().default(null),
 });
@@ -143,4 +142,10 @@ export const CREATE_BMI_SCHEMA = Joi.object({
   weight: Joi.number().required(),
   bmiEvaluation: Joi.string().required(),
   bmi: Joi.number().required(),
+})
+
+export const UPDATE_USER_SETTING_NOTIFICATION_SCHEMA = Joi.object({
+  enableNotification: Joi.boolean().required().default(true),
+  notificationToken: Joi.string().required(),
+  timeSendNotification: Joi.number().required()
 })

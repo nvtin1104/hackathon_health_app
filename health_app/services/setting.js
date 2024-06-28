@@ -37,6 +37,7 @@ const getToken = async () => {
 export const CREATE_CHAT = '/chat/message'
 export const GET_CHAT_HISTORY = '/chat'
 export const CREATE_BOT_ANSWER = '/chat/answer'
+export const UPDATE_USER_NOTIFICATION = '/users/notification'
 
 
 export default apiClient

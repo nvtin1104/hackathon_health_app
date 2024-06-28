@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 const packageJson = require('@/package.json');
+import { updateNotification } from '@/services/userServices';
 import {
 	StyleSheet,
 	Image,
@@ -117,50 +118,54 @@ const Item = ({
 );
 async function registerForPushNotificationsAsync() {
 	let token;
-
+  
 	if (Platform.OS === 'android') {
-		await Notifications.setNotificationChannelAsync('default', {
-			name: 'default',
-			importance: Notifications.AndroidImportance.MAX,
-			vibrationPattern: [0, 250, 250, 250],
-			lightColor: '#FF231F7C',
-		});
+	  await Notifications.setNotificationChannelAsync('default', {
+		name: 'default',
+		importance: Notifications.AndroidImportance.MAX,
+		vibrationPattern: [0, 250, 250, 250],
+		lightColor: '#FF231F7C',
+	  });
 	}
-
+  
 	if (Device.isDevice) {
-		const { status: existingStatus } =
-			await Notifications.getPermissionsAsync();
-		let finalStatus = existingStatus;
-		if (existingStatus !== 'granted') {
-			const { status } = await Notifications.requestPermissionsAsync();
-			finalStatus = status;
-		}
-		if (finalStatus !== 'granted') {
-			if (Device.brand !== 'Apple' && Device.brand !== 'Microsoft') {
-				// Check if the device is not a PC
-				// No alert, just return
-				return;
-			}
-		}
-		token = (
-			await Notifications.getExpoPushTokenAsync({
-				projectId: 'fe578bec-6565-4590-b832-edb66bbb355f',
-			})
-		).data;
-	} else {
+	  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+	  let finalStatus = existingStatus;
+  
+	  if (existingStatus !== 'granted') {
+		const { status } = await Notifications.requestPermissionsAsync();
+		finalStatus = status;
+	  }
+  
+	  if (finalStatus !== 'granted') {
+		// If the device is not an Apple or Microsoft device, simply return
 		if (Device.brand !== 'Apple' && Device.brand !== 'Microsoft') {
-			// Check if the device is not a PC
-			// No alert, just return
-			return;
+		  return;
+		} else {
+		  // Show an alert for Apple and Microsoft devices
+		  alert('Failed to get push token for push notification!');
 		}
+	  } else {
+		// Get the token
+		token = (await Notifications.getExpoPushTokenAsync({
+		  projectId: 'fe578bec-6565-4590-b832-edb66bbb355f',
+		})).data;
+	  }
+	} else {
+	  // If the device is not an Apple or Microsoft device, simply return
+	  if (Device.brand !== 'Apple' && Device.brand !== 'Microsoft') {
+		return;
+	  } else {
+		// Show an alert for Apple and Microsoft devices
+		alert('Must use physical device for Push Notifications');
+	  }
 	}
-
+  
 	return token;
-}
+  }
 
 export default function UserMainScreen() {
 	const { signOut } = useSession();
-	const [[isLoading, session], setSession] = useStorageState('session');
 	// Add a state variable for the notification toggle
 	const [expoPushToken, setExpoPushToken] = useState('');
 	const [isToggleSwitchOn, setIsToggleSwitchOn] = useState(false);
@@ -190,6 +195,7 @@ export default function UserMainScreen() {
 		});
 	}, [expoPushToken]);
 
+
 	useEffect(() => {
 		let intervalId;
 
@@ -206,8 +212,33 @@ export default function UserMainScreen() {
 		};
 	}, [isToggleSwitchOn, sendNotification]);
 
+	useEffect(() => {
+		onUpdateNotification();
+	},[isToggleSwitchOn]);
+
+	console.log("expoPushToken",expoPushToken)
 	//
-	const handlePress = (id: string) => {
+
+	const onUpdateNotification = async () => {
+		try {
+			if (expoPushToken != '') {
+				console.log("enableNotification", isToggleSwitchOn)
+				const payload = {
+					enableNotification: isToggleSwitchOn,
+					notificationToken: expoPushToken,
+					timeSendNotification: 60
+				}
+				await updateNotification(payload)
+				Alert.alert("thông báo", "đã lưu thành công")
+			}
+			
+		} catch (err) {
+			console.error(err)
+			Alert.alert("thông báo", "không lưu thành công")
+		}
+		
+	}
+	const handlePress = async (id: string) => {
 		switch (id) {
 			case 'log-out':
 				Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
@@ -253,6 +284,7 @@ export default function UserMainScreen() {
 				onPress={() => handlePress(item.id)}
 				isToggleSwitchOn={isToggleSwitchOn}
 				setIsToggleSwitchOn={setIsToggleSwitchOn}
+				
 			/>
 		);
 	};

@@ -282,6 +282,19 @@ const test = async (req, res) => {
     .json({ success: true, message: _id, email });
 };
 
+const updateNotification = async (req, res) => {
+  const { _id, email } = req.user
+  const body = req.body
+  const dataUser = await userModal.updateNotification(_id, body);
+  if (dataUser.acknowledged) {
+    const data = await userModal.getUserID(_id);
+    return res
+      .status(StatusCodes.OK)
+      .json({ success: true, message: 'Cập nhật thông tin thành công', data });
+  }
+  return res.status(StatusCodes.OK).json(dataUser);
+}
+
 export const usersController = {
   getUserID,
   getUserEmail,
@@ -292,4 +305,6 @@ export const usersController = {
   changePassWord,
   test,
   getU,
+  updateNotification,
+  updateNotification
 };
